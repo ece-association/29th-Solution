@@ -3493,14 +3493,6 @@
       if (copyTemplateBtn) {
         copyTemplateBtn.addEventListener('click', () => {
           const templateContent = `# 29th Solution – Proposal Document\n\n## 1. Team & Problem Info\n- **Team Name**: [Your Squad Name]\n- **Team Size**: 3–5 Members (All ECE Dept)\n- **Year(s)**: [1st / 2nd / 3rd / 4th Year]\n- **Chosen Problem**: [e.g. ECE-PS01 / ECE-PS05 / Open Innovation]\n\n## 2. Problem Understanding\n- Root cause & pain point identified in campus / labs\n- Target stakeholders & operational context\n\n## 3. Proposed Engineering Solution\n- Technical methodology & system architecture\n- Hardware components / Microcontrollers (ESP32/STM32/Sensors)\n- Software stack / Communication protocol (BLE/LoRa/MQTT)\n\n## 4. Proof of Concept (PoC)\n- **PoC Link**: [Google Drive / GitHub / Simulation Link]\n- Description of simulation, schematic, or demo test\n\n## 5. Practical Impact & Feasibility\n- Expected campus benefits & energy/time savings\n- Ease of fabrication for Final Display`;
-
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(templateContent).then(() => {
-              showToast('Proposal Document Template copied to clipboard!');
-            });
-          } else {
-            showToast('Template ready for drafting.');
-          }
         });
       }
 

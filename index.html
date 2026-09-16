@@ -337,7 +337,11 @@
       align-items: center;
       justify-content: space-between;
       height: var(--nav-height);
-      gap: 1.5rem;
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 2vw, 2.5rem);
+      gap: clamp(0.35rem, 0.9vw, 1.25rem);
     }
 
     .brand-group {
@@ -355,8 +359,8 @@
 
     /* PSG Shield Logo Frame - High Contrast White Card */
     .logo-frame-psg {
-      width: 48px;
-      height: 48px;
+      width: 42px;
+      height: 42px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -367,6 +371,7 @@
       position: relative;
       box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
       overflow: hidden;
+      flex-shrink: 0;
       transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
     }
 
@@ -378,8 +383,8 @@
 
     /* ECE Emblem Circular Frame */
     .logo-frame-ece {
-      width: 48px;
-      height: 48px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -389,6 +394,7 @@
       box-shadow: 0 0 12px rgba(0, 212, 255, 0.35);
       overflow: hidden;
       padding: 0;
+      flex-shrink: 0;
       transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
     }
 
@@ -448,22 +454,42 @@
       letter-spacing: 0.02em;
     }
 
-    /* Navigation Links */
+    /* Navigation Links: display contents so all 8 items are direct flex children of nav-inner with equal space */
     .nav-links {
+      display: contents;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links li {
+      list-style: none;
       display: flex;
       align-items: center;
-      gap: 1.35rem;
-      list-style: none;
+      margin: 0;
+      padding: 0;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-link {
       font-family: var(--font-body);
-      font-size: 0.9375rem;
+      font-size: clamp(0.8125rem, 0.88vw, 0.925rem);
       font-weight: 500;
       color: var(--text-muted);
-      padding: 0.4rem 0.2rem;
+      padding: 0.4rem 0.15rem;
       position: relative;
       transition: color var(--transition-fast);
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .nav-submit-btn {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-size: clamp(0.75rem, 0.8vw, 0.8125rem);
+      padding: 0.42rem 0.85rem;
     }
 
     .nav-link::after {
@@ -1913,6 +1939,14 @@
        RESPONSIVE BREAKPOINTS
        ========================================================================== */
     @media (max-width: 1024px) {
+      .nav-links {
+        display: none !important;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
       .hero-layout-grid {
         grid-template-columns: 1fr;
         gap: 3rem;
@@ -2040,30 +2074,29 @@
         </div>
       </a>
 
-      <!-- Desktop Nav Links -->
+      <!-- Desktop Nav Items: 2 to 8, in one line separated by equal space -->
       <ul class="nav-links">
         <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#problems" class="nav-link">Problem Statements</a></li>
+        <li><a href="#problems" class="nav-link">Problem Statement</a></li>
         <li><a href="#timeline" class="nav-link">Timeline</a></li>
         <li><a href="#submission-guide" class="nav-link">Submission Guidelines</a></li>
         <li><a href="#guidelines" class="nav-link">Team Guidelines</a></li>
         <li><a href="#evaluation" class="nav-link">Evaluation Criteria</a></li>
+        <li>
+          <a href="https://forms.gle/56fXMWrzPSck6VXUA" class="btn btn-copper btn-sm nav-submit-btn" target="_blank"
+            rel="noopener noreferrer">
+            <span>Idea Submission</span>
+            <span class="pcb-via" style="border-color: #071512;"></span>
+          </a>
+        </li>
       </ul>
 
-      <!-- Action Button -->
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <a href="https://forms.gle/56fXMWrzPSck6VXUA" class="btn btn-copper btn-sm">
-          <span>CLICK HERE TO SUBMIT YOUR IDEA</span>
-          <span class="pcb-via" style="border-color: #071512;"></span>
-        </a>
-
-        <!-- Mobile Hamburger Toggle -->
-        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-        </button>
-      </div>
+      <!-- Mobile Hamburger Toggle -->
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
 
     </div>
   </nav>
@@ -2093,7 +2126,11 @@
       </ul>
     </div>
     <div>
-      <a href="#submission-guide" class="btn btn-copper" style="width: 100%;" id="drawerSubmitLink">
+      <a href="https://forms.gle/56fXMWrzPSck6VXUA" target="_blank" rel="noopener noreferrer" class="btn btn-copper"
+        style="width: 100%; margin-bottom: 0.75rem;">
+        Idea Submission
+      </a>
+      <a href="#submission-guide" class="btn btn-outline" style="width: 100%;" id="drawerSubmitLink">
         Read Submission Guide
       </a>
       <div

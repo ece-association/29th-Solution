@@ -91,6 +91,9 @@
       background-color: var(--bg-deep);
       color: var(--text-main);
       text-size-adjust: 100%;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
     }
 
     body {
@@ -99,8 +102,18 @@
       color: var(--text-main);
       line-height: 1.6;
       overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
       min-height: 100vh;
       position: relative;
+    }
+
+    img,
+    svg,
+    canvas,
+    video {
+      max-width: 100%;
+      height: auto;
     }
 
     /* Focus & Selection */
@@ -143,8 +156,8 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 0;
       opacity: 0.42;
@@ -642,22 +655,30 @@
        ========================================================================== */
     .hero-section {
       position: relative;
-      padding: 4.5rem 0 4.5rem;
+      padding: clamp(2.5rem, 5vw, 4.5rem) 0;
       border-bottom: 1px solid var(--trace-border);
       overflow: hidden;
       z-index: 2;
+      width: 100%;
     }
 
     .hero-container {
       position: relative;
       z-index: 3;
+      width: 100%;
     }
 
     .hero-layout-grid {
       display: grid;
-      grid-template-columns: 1.35fr 0.85fr;
-      gap: 2.5rem;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+      gap: clamp(1.5rem, 3vw, 2.5rem);
       align-items: center;
+      width: 100%;
+    }
+
+    .hero-layout-grid>* {
+      min-width: 0;
+      max-width: 100%;
     }
 
     .hero-badge-strip {
@@ -779,8 +800,8 @@
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
       font-family: var(--font-mono);
-      font-size: 1.75rem;
-      height: 150px;
+      font-size: 0.85rem;
+      min-height: auto;
     }
 
     .scope-meta-item {
@@ -1416,10 +1437,15 @@
 
     .guide-columns {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       gap: 2.5rem;
       align-items: start;
-      width: 2120px;
+      width: 100%;
+    }
+
+    .guide-columns>* {
+      min-width: 0;
+      max-width: 100%;
     }
 
     .protocol-card {
@@ -1952,6 +1978,14 @@
       .search-box-wrapper {
         max-width: 100%;
       }
+
+      .scope-meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-section {
+        padding: 2rem 0;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -2004,12 +2038,12 @@
         <div class="brand-logos">
           <!-- PSG iTech Logo -->
           <div class="logo-frame-psg" title="PSG iTech College Shield Logo">
-            <img src="PSG.png" alt="PSG iTech Logo" class="logo-img">
+            <img src="V:\ECE Association\PSG.png" alt="PSG iTech Logo" class="logo-img">
           </div>
 
           <!-- ECE Department Association 3D Emblem Logo -->
           <div class="logo-frame-ece" title="ECE Department Association Logo">
-            <img src="ECEA_LOGO.jpeg" alt="ECE Association Logo" class="logo-img-circle">
+            <img src="V:\ECE Association\ECEA_LOGO.jpeg" alt="ECE Association Logo" class="logo-img-circle">
           </div>
         </div>
 
@@ -2056,16 +2090,21 @@
       <div style="margin-bottom: 2rem;">
         <div class="pcb-tag cyan" style="margin-bottom: 0.5rem;">SYS_BUS // NAVIGATION</div>
         <div style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700;">29th Solution</div>
-        <div style="font-size: 0.85rem; color: var(--teal-light); font-family: var(--font-mono);">Edition 1 • ECE
+        <div style="font-size: 0.85rem; color: var(--teal-light); font-family: var(--font-mono);">Edition 1 •
+          ECE
           Association</div>
       </div>
       <ul class="drawer-links">
         <li><a href="#about" class="drawer-link"><span class="mono-id">01</span> About Event</a></li>
-        <li><a href="#problems" class="drawer-link"><span class="mono-id">02</span> Problem Statements (8)</a></li>
+        <li><a href="#problems" class="drawer-link"><span class="mono-id">02</span> Problem Statements (8)</a>
+        </li>
         <li><a href="#timeline" class="drawer-link"><span class="mono-id">03</span> Event Timeline</a></li>
-        <li><a href="#guidelines" class="drawer-link"><span class="mono-id">04</span> Guidelines & Rules</a></li>
-        <li><a href="#submission-guide" class="drawer-link"><span class="mono-id">05</span> Submission Protocol</a></li>
-        <li><a href="#evaluation" class="drawer-link"><span class="mono-id">06</span> Evaluation Criteria</a></li>
+        <li><a href="#guidelines" class="drawer-link"><span class="mono-id">04</span> Guidelines & Rules</a>
+        </li>
+        <li><a href="#submission-guide" class="drawer-link"><span class="mono-id">05</span> Submission
+            Protocol</a></li>
+        <li><a href="#evaluation" class="drawer-link"><span class="mono-id">06</span> Evaluation Criteria</a>
+        </li>
       </ul>
     </div>
     <div>
@@ -2112,7 +2151,8 @@
           <p class="hero-description">
             A Tech Challenge hosted by
             <strong>ECE Association of PSG Institute of Technology and Applied Research</strong>.
-            Tackle 7 curated departmental challenges or propose a campus-wide breakthrough under Open Innovation.
+            Tackle 7 curated departmental challenges or propose a campus-wide breakthrough under Open
+            Innovation.
           </p>
 
           <div class="hero-actions">
@@ -2223,13 +2263,16 @@
         <!-- Left Explanation Card -->
         <div class="about-content-card">
           <p>
-            Hosted by the <strong>ECE Association of PSG Institute of Technology and Applied Research</strong>,
-            this initiative challenges students to build deployable systems using embedded controllers, sensor networks,
+            Hosted by the <strong>ECE Association of PSG Institute of Technology and Applied
+              Research</strong>,
+            this initiative challenges students to build deployable systems using embedded controllers,
+            sensor networks,
             signal analysis, IoT, and intelligent software to eliminate day-to-day operational pain points.
           </p>
 
           <p>
-            Teams can either select one of the <strong>7 pre-identified problem statements</strong> curated directly by
+            Teams can either select one of the <strong>7 pre-identified problem statements</strong> curated
+            directly by
             the
             ECE Association or pioneer a novel hardware/software concept under <strong>Track 8: Open
               Innovation</strong>.
@@ -2242,11 +2285,15 @@
 
           <p>
             The hackathon runs in four well-defined stages:
-            <strong>Stage 1: Idea Submission</strong>, Tests your understanding and feasibility via an Idea Abstract.
-            <strong>Stage 2: Shortlisting</strong>, The ideas are evaluated and shortlisted by faculty and experts.
-            <strong>Stage 3: Prototype Build</strong>, Shortlisted teams transform their concepts into physical
+            <strong>Stage 1: Idea Submission</strong>, Tests your understanding and feasibility via an Idea
+            Abstract.
+            <strong>Stage 2: Shortlisting</strong>, The ideas are evaluated and shortlisted by faculty and
+            experts.
+            <strong>Stage 3: Prototype Build</strong>, Shortlisted teams transform their concepts into
+            physical
             prototypes.
-            <strong>Stage 4: Final Display</strong>, Shortlisted teams demonstrate their working prototype to jury.
+            <strong>Stage 4: Final Display</strong>, Shortlisted teams demonstrate their working prototype
+            to jury.
           </p>
         </div>
 
@@ -2256,7 +2303,8 @@
           <div class="spec-block">
             <h3 class="spec-block-title">Department Exclusivity</h3>
             <p class="spec-block-desc">
-              All team members must be ECE students at PSG iTech. Teams can comprise students across 1st, 2nd, 3rd, and
+              All team members must be ECE students at PSG iTech. Teams can comprise students across 1st,
+              2nd, 3rd, and
               4th years to encourage peer learning.
             </p>
           </div>
@@ -2264,7 +2312,8 @@
           <div class="spec-block">
             <h3 class="spec-block-title">Track Structure</h3>
             <p class="spec-block-desc">
-              Choose from the official 7 departmental problem statements or identify an unaddressed challenge on campus
+              Choose from the official 7 departmental problem statements or identify an unaddressed
+              challenge on campus
               under Open Innovation.
             </p>
           </div>
@@ -2272,7 +2321,8 @@
           <div class="spec-block">
             <h3 class="spec-block-title">Zero Initial Prototyping Barrier</h3>
             <p class="spec-block-desc">
-              No hardware assembly or component purchase is required for initial shortlisting. Submit your circuit
+              No hardware assembly or component purchase is required for initial shortlisting. Submit your
+              circuit
               simulation, architecture, or code proof to advance.
             </p>
           </div>
@@ -2327,7 +2377,8 @@
             </div>
             <h3 class="problem-title">Smart Mic Battery & Interference Alert</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> During classes and events, microphones may suddenly stop because their battery
+              <strong>Problem:</strong> During classes and events, microphones may suddenly stop because
+              their battery
               level is unknown. This causes interruptions, delays, and sometimes audio interference.
             </p>
           </div>
@@ -2351,7 +2402,8 @@
             </div>
             <h3 class="problem-title">Lab Equipment Management System</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Tracking laboratory equipment, its availability, usage, maintenance status, and
+              <strong>Problem:</strong> Tracking laboratory equipment, its availability, usage,
+              maintenance status, and
               damaged or missing items is often difficult with manual records.
             </p>
           </div>
@@ -2375,7 +2427,8 @@
             </div>
             <h3 class="problem-title">Smart Attendance & Classroom Verification</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Manual attendance consumes valuable class time, while proxy attendance can make
+              <strong>Problem:</strong> Manual attendance consumes valuable class time, while proxy
+              attendance can make
               conventional attendance systems unreliable.
             </p>
           </div>
@@ -2399,7 +2452,8 @@
             </div>
             <h3 class="problem-title">Hackathon Team Formation & Notes Sharing Platform</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Students often struggle to find suitable hackathon teammates based on skills and
+              <strong>Problem:</strong> Students often struggle to find suitable hackathon teammates based
+              on skills and
               interests, while useful notes and resources are scattered across different platforms.
             </p>
           </div>
@@ -2423,7 +2477,8 @@
             </div>
             <h3 class="problem-title">Campus Electricity Waste</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Lights, fans, and ACs are often left running in empty classrooms, causing
+              <strong>Problem:</strong> Lights, fans, and ACs are often left running in empty classrooms,
+              causing
               unnecessary electricity consumption and increased costs.
             </p>
           </div>
@@ -2447,10 +2502,14 @@
             </div>
             <h3 class="problem-title">Certificate Collection & Incentivization</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Students participate in various extracurricular and co-curricular activities,
-              but many do not submit or update their certificates in the college's existing Excel-based records. This
-              makes it difficult to maintain a complete record of student achievements. Develop an engaging solution
-              that encourages students to submit their certificates through rewards, recognition, gamification, or other
+              <strong>Problem:</strong> Students participate in various extracurricular and co-curricular
+              activities,
+              but many do not submit or update their certificates in the college's existing Excel-based
+              records. This
+              makes it difficult to maintain a complete record of student achievements. Develop an
+              engaging solution
+              that encourages students to submit their certificates through rewards, recognition,
+              gamification, or other
               innovative incentives.
             </p>
           </div>
@@ -2474,7 +2533,8 @@
             </div>
             <h3 class="problem-title">Lost & Found Intelligence</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Lost items on campus rarely reach their owners because there is no centralized,
+              <strong>Problem:</strong> Lost items on campus rarely reach their owners because there is no
+              centralized,
               smart matching system.
             </p>
           </div>
@@ -2499,7 +2559,8 @@
             </div>
             <h3 class="problem-title">Open Innovation – Identify & Solve a Campus Problem</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Identify a real, practical problem faced by students, faculty, staff, or the
+              <strong>Problem:</strong> Identify a real, practical problem faced by students, faculty,
+              staff, or the
               campus community that is not covered by the above problem statements.
             </p>
           </div>
@@ -2549,7 +2610,8 @@
             <h3 class="timeline-title">Initial Submission</h3>
             <div class="timeline-date-chip">DEADLINE: 23/09/2026</div>
             <p class="timeline-desc">
-              Submit your idea abstract and Proof of Concept (If possible). PoC can be a circuit simulation
+              Submit your idea abstract and Proof of Concept (If possible). PoC can be a circuit
+              simulation
               (Proteus/Tinkercad),
               architecture diagram, mock-up, or bench-test verification.
             </p>
@@ -2562,7 +2624,8 @@
             <h3 class="timeline-title">Technical Shortlisting</h3>
             <div class="timeline-date-chip">EVALUATION PHASE</div>
             <p class="timeline-desc">
-              The ECE Association jury screens submissions based on problem understanding, innovation, technical
+              The ECE Association jury screens submissions based on problem understanding, innovation,
+              technical
               feasibility. Qualified teams advance.
             </p>
           </div>
@@ -2585,7 +2648,8 @@
             <h3 class="timeline-title">Final Display</h3>
             <div class="timeline-date-chip">GRAND FINALE</div>
             <p class="timeline-desc">
-              Finalist squads present their working physical prototype live before the faculty and expert evaluation
+              Finalist squads present their working physical prototype live before the faculty and expert
+              evaluation
               committee.
             </p>
           </div>
@@ -2626,7 +2690,8 @@
               <div>
                 <div class="step-content-title">Choose Problem Statement</div>
                 <div class="step-content-desc">
-                  Select one statement from the curated ECE Association list (ECE-PS01 to ECE-PS07) or define your own
+                  Select one statement from the curated ECE Association list (ECE-PS01 to ECE-PS07) or
+                  define your own
                   challenge under ECE-PS08 (Open Innovation).
                 </div>
               </div>
@@ -2637,7 +2702,8 @@
               <div>
                 <div class="step-content-title">Draft Idea Abstract & Architecture</div>
                 <div class="step-content-desc">
-                  Outline the problem context, root cause, proposed engineering methodology, block diagram, and expected
+                  Outline the problem context, root cause, proposed engineering methodology, block
+                  diagram, and expected
                   hardware components (e.g. ESP32, PIR sensors, LoRa, RF modules).
                 </div>
               </div>
@@ -2649,8 +2715,10 @@
                 <div class="step-content-title">Build Proof of Concept (PoC) [If Possible]</div>
                 <div class="step-content-desc">
                   Demonstrate feasibility without assembling full hardware. Acceptable PoCs include:
-                  <strong>Circuit simulations</strong> (Proteus / TinkerCAD / MATLAB), <strong>architectural
-                    schematics</strong>, <strong>UI/UX wireframes</strong>, or <strong>preliminary code on
+                  <strong>Circuit simulations</strong> (Proteus / TinkerCAD / MATLAB),
+                  <strong>architectural
+                    schematics</strong>, <strong>UI/UX wireframes</strong>, or <strong>preliminary
+                    code on
                     GitHub</strong>.
                 </div>
               </div>
@@ -2696,7 +2764,8 @@
       <div class="section-header" style="text-align: center; max-width: 780px; margin-left: auto; margin-right: auto;">
         <h2 class="section-title">Rules & Participation Guidelines</h2>
         <p class="section-desc" style="margin: 0 auto;">
-          Everything you need to know about team structure, eligibility, original submission requirements, and prototype
+          Everything you need to know about team structure, eligibility, original submission requirements, and
+          prototype
           expectations.
         </p>
       </div>
@@ -2716,7 +2785,8 @@
           <div class="accordion-body" id="rule1Content" style="max-height: 250px;">
             <div class="accordion-body-content">
               Each team must consist of a minimum of <strong>3 members</strong> and a maximum of <strong>5
-                members</strong>. Solo entries and teams exceeding 5 members are strictly not permitted to ensure
+                members</strong>. Solo entries and teams exceeding 5 members are strictly not permitted
+              to ensure
               balanced collaboration. Each individual may participate in only one team.
             </div>
           </div>
@@ -2733,8 +2803,10 @@
           </button>
           <div class="accordion-body" id="rule2Content">
             <div class="accordion-body-content">
-              <strong>All team members must be students of the ECE Department</strong> at PSG Institute of Technology
-              and Applied Research. Members can be from any year of study (1st, 2nd, 3rd, or Final year). Inter-year
+              <strong>All team members must be students of the ECE Department</strong> at PSG Institute of
+              Technology
+              and Applied Research. Members can be from any year of study (1st, 2nd, 3rd, or Final year).
+              Inter-year
               teams combining seniors and juniors are encouraged.
             </div>
           </div>
@@ -2751,8 +2823,10 @@
           </button>
           <div class="accordion-body" id="rule3Content">
             <div class="accordion-body-content">
-              Teams must choose <strong>one problem statement</strong> from the given list (ECE-PS01 to ECE-PS07).
-              Alternatively, under <strong>Open Innovation (ECE-PS08)</strong>, teams may independently identify and
+              Teams must choose <strong>one problem statement</strong> from the given list (ECE-PS01 to
+              ECE-PS07).
+              Alternatively, under <strong>Open Innovation (ECE-PS08)</strong>, teams may independently
+              identify and
               frame a real, practical challenge faced by the campus community.
             </div>
           </div>
@@ -2769,8 +2843,10 @@
           </button>
           <div class="accordion-body" id="rule4Content">
             <div class="accordion-body-content">
-              Submit your idea summary along with a <strong>Proof of Concept (PoC) [IF Possible]</strong> on or before
-              <strong>23/09/2026</strong>. The PoC demonstrates the viability of your design and can include circuit
+              Submit your idea summary along with a <strong>Proof of Concept (PoC) [IF Possible]</strong>
+              on or before
+              <strong>23/09/2026</strong>. The PoC demonstrates the viability of your design and can
+              include circuit
               simulations, block diagrams, pseudocode, UI wireframes, or preliminary test data.
             </div>
           </div>
@@ -2799,14 +2875,17 @@
           <button class="accordion-header" aria-expanded="false" aria-controls="rule5Content">
             <div class="accordion-header-left">
               <span class="accordion-num">06</span>
-              <span class="accordion-label">Prototype Timing: Only Required for Shortlisted Finalists</span>
+              <span class="accordion-label">Prototype Timing: Only Required for Shortlisted
+                Finalists</span>
             </div>
             <span class="accordion-icon" aria-hidden="true">+</span>
           </button>
           <div class="accordion-body" id="rule5Content">
             <div class="accordion-body-content">
-              <strong>A working prototype is NOT required for the initial submission.</strong> Do not rush to assemble
-              physical hardware before shortlisting. Only teams shortlisted after the Round 1 evaluation will be called
+              <strong>A working prototype is NOT required for the initial submission.</strong> Do not rush
+              to assemble
+              physical hardware before shortlisting. Only teams shortlisted after the Round 1 evaluation
+              will be called
               upon to develop a functional working prototype for the <strong>Final Display</strong>.
             </div>
           </div>
@@ -2817,15 +2896,18 @@
           <button class="accordion-header" aria-expanded="false" aria-controls="rule6Content">
             <div class="accordion-header-left">
               <span class="accordion-num">07</span>
-              <span class="accordion-label">Originality: Original Ideas with Open-Source & Existing Modules
+              <span class="accordion-label">Originality: Original Ideas with Open-Source & Existing
+                Modules
                 Allowed</span>
             </div>
             <span class="accordion-icon" aria-hidden="true">+</span>
           </button>
           <div class="accordion-body" id="rule6Content">
             <div class="accordion-body-content">
-              The proposed engineering solution and implementation must be <strong>original work</strong>. You are
-              completely permitted and encouraged to leverage existing technologies, microcontroller boards, sensor
+              The proposed engineering solution and implementation must be <strong>original work</strong>.
+              You are
+              completely permitted and encouraged to leverage existing technologies, microcontroller
+              boards, sensor
               modules, communication APIs, and open-source libraries to build upon.
             </div>
           </div>
@@ -2845,7 +2927,8 @@
       <div class="section-header">
         <h2 class="section-title">Evaluation Criteria</h2>
         <p class="section-desc">
-          Every submission and subsequent prototype demonstration is objectively measured across six key technical
+          Every submission and subsequent prototype demonstration is objectively measured across six key
+          technical
           pillars.
         </p>
       </div>
@@ -2859,7 +2942,8 @@
           </div>
           <h3 class="eval-title">Problem Understanding</h3>
           <p class="eval-desc">
-            Clarity in defining the root cause of the problem, operational pain-points, stakeholder context, and campus
+            Clarity in defining the root cause of the problem, operational pain-points, stakeholder context,
+            and campus
             relevance.
           </p>
         </div>
@@ -2871,7 +2955,8 @@
           </div>
           <h3 class="eval-title">Innovation</h3>
           <p class="eval-desc">
-            Novelty of the solution approach, creative hardware/software architecture, and differentiation from trivial
+            Novelty of the solution approach, creative hardware/software architecture, and differentiation
+            from trivial
             or existing methods.
           </p>
         </div>
@@ -2883,7 +2968,8 @@
           </div>
           <h3 class="eval-title">Feasibility</h3>
           <p class="eval-desc">
-            Realistic implementation within constraints, component availability, budget practicality, power consumption,
+            Realistic implementation within constraints, component availability, budget practicality, power
+            consumption,
             and deployability.
           </p>
         </div>
@@ -2895,7 +2981,8 @@
           </div>
           <h3 class="eval-title">Practical Impact</h3>
           <p class="eval-desc">
-            Measurable positive impact on campus operations, energy savings, reliability enhancement, or user
+            Measurable positive impact on campus operations, energy savings, reliability enhancement, or
+            user
             convenience for students and faculty.
           </p>
         </div>
@@ -2907,7 +2994,8 @@
           </div>
           <h3 class="eval-title">Scalability and Adaptability</h3>
           <p class="eval-desc">
-            Potential to expand, adapt, or integrate the solution for larger deployments, additional use cases, or
+            Potential to expand, adapt, or integrate the solution for larger deployments, additional use
+            cases, or
             future improvements.
           </p>
         </div>
@@ -2920,7 +3008,8 @@
           </div>
           <h3 class="eval-title">Presentation</h3>
           <p class="eval-desc">
-            Articulation during question-and-answer session, technical confidence, schematic clarity, and live prototype
+            Articulation during question-and-answer session, technical confidence, schematic clarity, and
+            live prototype
             demonstration at Final Display.
           </p>
         </div>
@@ -2932,7 +3021,8 @@
         <div class="pcb-tag copper" style="margin-bottom: 1rem;">FINAL CALL FOR CIRCUITS</div>
         <h2 class="closing-title">Ready to Power Up Your Solution?</h2>
         <p class="closing-desc">
-          Assemble your ECE team, pick your challenge, and submit your idea abstract with Proof of Concept before the
+          Assemble your ECE team, pick your challenge, and submit your idea abstract with Proof of Concept
+          before the
           clock runs out on 23 September 2026.
         </p>
         <div class="closing-btns">
@@ -2962,11 +3052,11 @@
           <div class="footer-brand-logos">
             <!-- PSG Shield Logo -->
             <div class="logo-frame-psg" title="PSG iTech College Shield Logo">
-              <img src="PSG.png" alt="PSG iTech Logo" class="logo-img">
+              <img src="V:\ECE Association\PSG.png" alt="PSG iTech Logo" class="logo-img">
             </div>
             <!-- ECE Association 3D Emblem Logo -->
             <div class="logo-frame-ece" title="ECE Department Association Logo">
-              <img src="ECEA_LOGO.jpeg" alt="ECE Association Logo" class="logo-img-circle">
+              <img src="V:\ECE Association\ECEA_LOGO.jpeg" alt="ECE Association Logo" class="logo-img-circle">
             </div>
           </div>
 

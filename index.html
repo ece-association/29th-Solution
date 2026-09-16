@@ -1,0 +1,3454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>29th Solution – Edition 1 | ECE Association • PSG iTech</title>
+  <meta name="description"
+    content="29th Solution – Edition 1: Premier electronics & communication hackathon hosted by the ECE Association of PSG Institute of Technology and Applied Research. Theme: Problems by ECE Association. Think. Innovate. Solve.">
+
+  <!-- Google Fonts: Space Grotesk, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       PCB / CIRCUIT-BOARD DESIGN SYSTEM & ECE COLOR PALETTE
+       ========================================================================== */
+    :root {
+      /* Theme Base Palette */
+      --bg-base: #0c201b;
+      /* Deep solder-mask board-green base */
+      --bg-deep: #071512;
+      /* Deepest solder-resist black-green */
+      --bg-panel: #10302a;
+      /* Circuit substrate cards */
+      --bg-panel-elevated: #143d35;
+      --bg-panel-hover: #194e44;
+      --bg-card-dark: #091a16;
+
+      /* High-Voltage Copper & Amber Accents */
+      --copper-primary: #cf8a4c;
+      /* Authentic copper trace */
+      --copper-bright: #f0a359;
+      /* Solder point amber highlight */
+      --copper-glow: rgba(240, 163, 89, 0.35);
+      --copper-dim: #945728;
+
+      /* Electronic Neon Accents (from ECE Association Emblem) */
+      --neon-cyan: #00d4ff;
+      /* Digital signal pulse / logic HIGH */
+      --neon-cyan-glow: rgba(0, 212, 255, 0.3);
+      --neon-violet: #a855f7;
+      /* High-frequency trace glow */
+      --teal-accent: #59ab9c;
+      /* Silkscreen green-teal */
+      --teal-light: #7cd0c0;
+
+      /* Silkscreen Typography */
+      --text-main: #f3efe6;
+      /* Warm silkscreen off-white */
+      --text-muted: #a6c4b8;
+      /* PCB substrate secondary text */
+      --text-dim: #6b8f82;
+      /* Technical component spec labels */
+      --text-amber: #f8c38b;
+
+      /* PCB Traces & Borders */
+      --trace-border: rgba(207, 138, 76, 0.28);
+      --trace-border-bright: rgba(240, 163, 89, 0.6);
+      --cyan-border: rgba(0, 212, 255, 0.35);
+      --grid-line: rgba(89, 171, 156, 0.06);
+      --grid-dot: rgba(207, 138, 76, 0.15);
+
+      /* Typography & Metrics */
+      --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --container-max: 1240px;
+      --nav-height: 76px;
+      --topbar-height: 40px;
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset & Base Setup */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Focus & Selection */
+    ::selection {
+      background: var(--copper-primary);
+      color: #071512;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--copper-bright);
+      outline-offset: 3px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    /* ==========================================================================
+       INTERACTIVE PCB CANVAS & BACKGROUND CIRCUIT GRAPHICS
+       ========================================================================== */
+    #pcbCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.42;
+    }
+
+    /* Hardware Grid Overlay */
+    .hardware-grid-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(var(--grid-dot) 1px, transparent 1px),
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 32px 32px, 32px 32px, 32px 32px;
+      background-position: 0 0, 0 0, 0 0;
+    }
+
+    /* Circuit Board Accents */
+    .pcb-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border-radius: 2px;
+      background: rgba(16, 48, 42, 0.85);
+      border: 1px solid var(--teal-accent);
+      color: var(--teal-light);
+      position: relative;
+    }
+
+    .pcb-tag.copper {
+      background: rgba(207, 138, 76, 0.14);
+      border-color: var(--trace-border);
+      color: var(--copper-bright);
+    }
+
+    .pcb-tag.cyan {
+      background: rgba(0, 212, 255, 0.12);
+      border-color: var(--cyan-border);
+      color: var(--neon-cyan);
+    }
+
+    .pcb-via {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 1.5px solid var(--copper-bright);
+      background: var(--bg-deep);
+      display: inline-block;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .pcb-via::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2.5px;
+      height: 2.5px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+    }
+
+    .test-point {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      user-select: none;
+    }
+
+    /* ==========================================================================
+       TOP INSTITUTIONAL STRIP
+       ========================================================================== */
+    .top-bar {
+      background: var(--bg-deep);
+      border-bottom: 1px solid rgba(89, 171, 156, 0.2);
+      font-size: 0.8125rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1001;
+    }
+
+    .top-bar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: var(--topbar-height);
+      padding: 0.35rem 0;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+    }
+
+    .top-bar-college {
+      color: var(--text-main);
+      letter-spacing: 0.02em;
+    }
+
+    .top-bar-city {
+      color: var(--text-dim);
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .circuit-status-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--teal-light);
+      font-size: 0.75rem;
+    }
+
+    .pulse-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00d4ff;
+      box-shadow: 0 0 10px #00d4ff;
+      animation: ledPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes ledPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+    }
+
+    /* ==========================================================================
+       STICKY NAVIGATION BAR (CLEAN DUAL LOGOS)
+       ========================================================================== */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(7, 21, 18, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--trace-border);
+      transition: background var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .site-nav.scrolled {
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8), 0 1px 0 var(--copper-primary);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: var(--nav-height);
+      gap: 1.5rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      text-decoration: none;
+    }
+
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* PSG Shield Logo Frame - High Contrast White Card */
+    .logo-frame-psg {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 6px;
+      padding: 3px;
+      position: relative;
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+      overflow: hidden;
+      transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .logo-frame-psg:hover {
+      border-color: var(--copper-bright);
+      box-shadow: 0 0 18px var(--copper-glow);
+      transform: translateY(-1px);
+    }
+
+    /* ECE Emblem Circular Frame */
+    .logo-frame-ece {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      border: 1.5px solid var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 212, 255, 0.35);
+      overflow: hidden;
+      padding: 0;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .logo-frame-ece:hover {
+      border-color: var(--copper-bright);
+      box-shadow: 0 0 18px var(--copper-glow);
+      transform: translateY(-1px);
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .logo-img-circle {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.15 rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .brand-edition {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--copper-bright);
+      background: rgba(207, 138, 76, 0.16);
+      border: 1px solid var(--trace-border);
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      color: var(--teal-light);
+      letter-spacing: 0.02em;
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.35rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 0.4rem 0.2rem;
+      position: relative;
+      transition: color var(--transition-fast);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--copper-bright);
+      box-shadow: 0 0 8px var(--copper-bright);
+      transition: width var(--transition-fast);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text-main);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.65rem 1.35rem;
+      border-radius: 3px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.03em;
+      position: relative;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn-copper {
+      background: var(--copper-primary);
+      color: #071512;
+      border-color: var(--copper-bright);
+      box-shadow: 0 4px 14px rgba(207, 138, 76, 0.28);
+    }
+
+    .btn-copper:hover {
+      background: var(--copper-bright);
+      box-shadow: 0 6px 20px rgba(240, 163, 89, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-cyan {
+      background: rgba(0, 212, 255, 0.12);
+      color: var(--neon-cyan);
+      border-color: var(--cyan-border);
+    }
+
+    .btn-cyan:hover {
+      background: rgba(0, 212, 255, 0.22);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 16px var(--neon-cyan-glow);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: rgba(16, 48, 42, 0.7);
+      color: var(--text-main);
+      border-color: var(--teal-accent);
+    }
+
+    .btn-outline:hover {
+      background: rgba(89, 171, 156, 0.2);
+      border-color: var(--teal-light);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-sm {
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8125rem;
+    }
+
+    /* Mobile Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 28px;
+      height: 20px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 1002;
+    }
+
+    .hamburger-line {
+      width: 100%;
+      height: 2px;
+      background: var(--text-main);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      transform-origin: center;
+    }
+
+    .hamburger.open .hamburger-line:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+      background: var(--copper-bright);
+    }
+
+    .hamburger.open .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.open .hamburger-line:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+      background: var(--copper-bright);
+    }
+
+    /* Mobile Drawer */
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 380px;
+      height: 100vh;
+      background: var(--bg-deep);
+      border-left: 1px solid var(--trace-border);
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+      padding: 6rem 2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 999;
+    }
+
+    .mobile-drawer.open {
+      right: 0;
+    }
+
+    .drawer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .drawer-link {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .drawer-link .mono-id {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ==========================================================================
+       HERO SECTION WITH OSCILLOSCOPE & CIRCUIT ARTWORK
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      padding: 4.5rem 0 4.5rem;
+      border-bottom: 1px solid var(--trace-border);
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .hero-container {
+      position: relative;
+      z-index: 3;
+    }
+
+    .hero-layout-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .hero-badge-strip {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.4rem, 5.2vw, 4.15rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .hero-title .copper-glow {
+      color: var(--copper-bright);
+      text-shadow: 0 0 25px rgba(240, 163, 89, 0.35);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-mono);
+      font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--neon-cyan);
+      margin-bottom: 1.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-tagline-dot {
+      color: var(--copper-bright);
+    }
+
+    .hero-description {
+      font-size: clamp(1.05rem, 1.8vw, 1.225rem);
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 2.25rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+
+    /* RIGHT SIDE: OSCILLOSCOPE MONITOR & ECE EMBLEM CARD */
+    .oscilloscope-card {
+      background: var(--bg-deep);
+      border: 1.5px solid var(--trace-border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      position: relative;
+      box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 212, 255, 0.1);
+    }
+
+    .oscilloscope-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    }
+
+    .scope-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(89, 171, 156, 0.2);
+    }
+
+    .scope-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .scope-screen {
+      width: 100%;
+      height: 150px;
+      background: #030e0b;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    #waveCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .scope-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      height: 150px;
+    }
+
+    .scope-meta-item {
+      background: rgba(16, 48, 42, 0.6);
+      border: 1px solid rgba(89, 171, 156, 0.2);
+      padding: 0.5rem 0.65rem;
+      border-radius: 2px;
+    }
+
+
+    .scope-meta-label {
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .scope-meta-val {
+      color: var(--copper-bright);
+      font-weight: 600;
+    }
+
+    /* COUNTDOWN TIMER CARD */
+    .countdown-card {
+      background: var(--bg-deep);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      padding: 1.75rem;
+      position: relative;
+      box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.65);
+      margin-bottom: 2.5rem;
+    }
+
+    .countdown-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--copper-bright), transparent);
+    }
+
+    .countdown-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(89, 171, 156, 0.18);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .countdown-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--copper-bright);
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .countdown-target-date {
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      color: var(--neon-cyan);
+      background: rgba(0, 212, 255, 0.1);
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      border: 1px solid var(--cyan-border);
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .countdown-unit {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      padding: 1.1rem 0.75rem;
+      text-align: center;
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .countdown-number {
+      font-family: var(--font-mono);
+      font-size: clamp(1.9rem, 4vw, 3.25rem);
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .countdown-unit-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--copper-bright);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .countdown-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* TELEMETRY STRIP */
+    .telemetry-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      border-top: 1px dashed rgba(89, 171, 156, 0.25);
+      padding-top: 2rem;
+    }
+
+    .telemetry-item {
+      background: rgba(16, 48, 42, 0.45);
+      border: 1px solid rgba(89, 171, 156, 0.2);
+      padding: 1rem 1.25rem;
+      border-radius: 3px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .telemetry-item:hover {
+      border-color: var(--copper-primary);
+    }
+
+    .telemetry-code {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--teal-light);
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.05em;
+    }
+
+    .telemetry-val {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .telemetry-note {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ==========================================================================
+       SECTION HEADERS & SYSTEM LABELS
+       ========================================================================== */
+    .section-padding {
+      padding: 5.5rem 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-header {
+      margin-bottom: 3.5rem;
+      position: relative;
+    }
+
+    .section-silk-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--copper-bright);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.5vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       ABOUT SECTION
+       ========================================================================== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    .about-content-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      padding: 2.5rem;
+      position: relative;
+    }
+
+    .about-content-card p {
+      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .about-content-card p strong {
+      color: var(--text-main);
+    }
+
+    .about-quote-box {
+      margin: 1.75rem 0 1.25rem;
+      padding: 1.25rem 1.5rem;
+      background: rgba(7, 21, 18, 0.75);
+      border-left: 3px solid var(--neon-cyan);
+      border-top: 1px solid var(--trace-border);
+      border-right: 1px solid var(--trace-border);
+      border-bottom: 1px solid var(--trace-border);
+    }
+
+    .about-quote-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .about-quote-text {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .about-specs-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .spec-block {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .spec-block:hover {
+      border-color: var(--copper-bright);
+      transform: translateX(4px);
+    }
+
+    .spec-block-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--teal-light);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.06em;
+    }
+
+    .spec-block-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+
+    .spec-block-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       PROBLEM STATEMENTS SECTION (8 COMPLETE STATEMENTS)
+       ========================================================================== */
+    .problems-section {
+      background: rgba(7, 21, 18, 0.55);
+      border-top: 1px solid var(--trace-border);
+      border-bottom: 1px solid var(--trace-border);
+    }
+
+    .filter-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      background: var(--bg-deep);
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      background: transparent;
+      border: 1px solid rgba(89, 171, 156, 0.25);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      font-weight: 500;
+      padding: 0.45rem 0.85rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.02em;
+    }
+
+    .filter-tab:hover {
+      border-color: var(--neon-cyan);
+      color: var(--text-main);
+    }
+
+    .filter-tab.active {
+      background: rgba(207, 138, 76, 0.18);
+      border-color: var(--copper-bright);
+      color: var(--copper-bright);
+      font-weight: 600;
+    }
+
+    .search-box-wrapper {
+      position: relative;
+      min-width: 260px;
+      flex-grow: 1;
+      max-width: 380px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 3px;
+      padding: 0.55rem 0.85rem 0.55rem 2.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--text-main);
+      transition: border-color var(--transition-fast);
+    }
+
+    .search-input:focus {
+      border-color: var(--neon-cyan);
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .problem-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .problem-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--copper-bright);
+      box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.7), 0 0 15px rgba(207, 138, 76, 0.15);
+    }
+
+    .problem-card.open-innovation {
+      border-color: var(--teal-accent);
+      background: linear-gradient(180deg, rgba(16, 48, 42, 0.95) 0%, rgba(7, 28, 24, 0.95) 100%);
+    }
+
+    .problem-card.open-innovation::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--copper-bright));
+    }
+
+    .problem-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .problem-id {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--copper-bright);
+      letter-spacing: 0.06em;
+      background: rgba(207, 138, 76, 0.12);
+      border: 1px solid var(--trace-border);
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+    }
+
+    .problem-domain {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--teal-light);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .problem-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text-main);
+      margin-bottom: 0.9rem;
+    }
+
+    .problem-statement-text {
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .problem-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px dashed rgba(89, 171, 156, 0.2);
+      padding-top: 1rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .copy-statement-btn {
+      background: transparent;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 2px;
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .copy-statement-btn:hover {
+      color: var(--copper-bright);
+      background: rgba(207, 138, 76, 0.12);
+    }
+
+    /* ==========================================================================
+       TIMELINE SECTION (4 CONNECTED STAGES)
+       ========================================================================== */
+    .timeline-wrapper {
+      position: relative;
+      margin-top: 2rem;
+    }
+
+    .timeline-trace-bar {
+      position: absolute;
+      top: 48px;
+      left: 5%;
+      right: 5%;
+      height: 3px;
+      background: rgba(89, 171, 156, 0.2);
+      z-index: 1;
+    }
+
+    .timeline-trace-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--copper-primary), var(--neon-cyan));
+      box-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .timeline-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      padding: 1.75rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .timeline-card:hover {
+      border-color: var(--copper-bright);
+      transform: translateY(-4px);
+    }
+
+    .timeline-node-pin {
+      width: 34px;
+      height: 34px;
+      background: var(--bg-deep);
+      border: 2px solid var(--copper-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--copper-bright);
+      box-shadow: 0 0 12px rgba(207, 138, 76, 0.35);
+      position: relative;
+    }
+
+    .timeline-card.active-stage .timeline-node-pin {
+      background: var(--copper-primary);
+      color: #071512;
+      border-color: var(--copper-bright);
+      box-shadow: 0 0 16px var(--copper-bright);
+    }
+
+    .timeline-stage-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--teal-light);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+
+    .timeline-title {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      line-height: 1.25;
+    }
+
+    .timeline-date-chip {
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      color: var(--copper-bright);
+      font-weight: 600;
+      background: rgba(207, 138, 76, 0.12);
+      border: 1px solid var(--trace-border);
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      display: inline-block;
+      margin-bottom: 0.85rem;
+      width: fit-content;
+    }
+
+    .timeline-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ==========================================================================
+       SUBMISSION INSTRUCTION & PROTOCOL GUIDE (EXPLAINS EVERYTHING)
+       ========================================================================== */
+    .submission-guide-section {
+      background: linear-gradient(180deg, var(--bg-deep) 0%, #0d2721 100%);
+      border-top: 1px solid var(--trace-border);
+      border-bottom: 1px solid var(--trace-border);
+    }
+
+    .guide-columns {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 2.5rem;
+      align-items: start;
+      width: 2120px;
+    }
+
+    .protocol-card {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--trace-border);
+      border-radius: 6px;
+      padding: 2.25rem;
+      position: relative;
+    }
+
+    .protocol-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--copper-bright), var(--neon-cyan));
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .step-num-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      background: rgba(0, 212, 255, 0.15);
+      border: 1px solid var(--cyan-border);
+      color: var(--neon-cyan);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+    }
+
+    .step-content-desc {
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Template Code Box */
+    .template-card {
+      background: #05120f;
+      border: 1px solid var(--trace-border);
+      border-radius: 6px;
+      padding: 1.75rem;
+    }
+
+    .template-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(89, 171, 156, 0.2);
+    }
+
+    .template-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--copper-bright);
+    }
+
+    .template-code-view {
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      color: var(--teal-light);
+      background: #030a08;
+      border: 1px solid rgba(89, 171, 156, 0.15);
+      padding: 1.25rem;
+      border-radius: 4px;
+      line-height: 1.65;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    /* ==========================================================================
+       GUIDELINES SECTION (ACCESSIBLE ACCORDION)
+       ========================================================================== */
+    .guidelines-wrapper {
+      max-width: 880px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .accordion-item {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color var(--transition-fast);
+    }
+
+    .accordion-item:focus-within,
+    .accordion-item.open {
+      border-color: var(--copper-bright);
+    }
+
+    .accordion-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text-main);
+      gap: 1rem;
+    }
+
+    .accordion-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .accordion-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--copper-bright);
+      background: rgba(207, 138, 76, 0.12);
+      border: 1px solid var(--trace-border);
+      width: 28px;
+      height: 28px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .accordion-label {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .accordion-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--teal-light);
+      transition: transform var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .accordion-item.open .accordion-icon {
+      transform: rotate(45deg);
+      color: var(--copper-bright);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(7, 21, 18, 0.5);
+    }
+
+    .accordion-body-content {
+      padding: 0 1.5rem 1.5rem 3.25rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      border-top: 1px dashed rgba(89, 171, 156, 0.15);
+      padding-top: 1rem;
+    }
+
+    .accordion-body-content strong {
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       EVALUATION CRITERIA (6 ITEMS GRID)
+       ========================================================================== */
+    .evaluation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .eval-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--trace-border);
+      border-radius: 4px;
+      padding: 2rem 1.75rem;
+      position: relative;
+      transition: all var(--transition-fast);
+    }
+
+    .eval-card:hover {
+      border-color: var(--copper-bright);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .eval-pin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .eval-component-id {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      letter-spacing: 0.06em;
+    }
+
+    .eval-score-weight {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--copper-bright);
+      background: rgba(207, 138, 76, 0.12);
+      border: 1px solid var(--trace-border);
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+    }
+
+    .eval-title {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .eval-desc {
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       CLOSING CALLOUT BANNER
+       ========================================================================== */
+    .closing-panel {
+      margin-top: 4rem;
+      background: linear-gradient(135deg, var(--bg-deep) 0%, #10322b 100%);
+      border: 1px solid var(--trace-border-bright);
+      border-radius: 6px;
+      padding: 3.5rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    .closing-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--copper-bright), transparent);
+    }
+
+    .closing-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.8vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .closing-desc {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    .closing-btns {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       TOAST NOTIFICATIONS
+       ========================================================================== */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-deep);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+      padding: 0.85rem 1.25rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all var(--transition-fast);
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       FOOTER (ONLY CLEAN OFFICIAL LOGOS)
+       ========================================================================== */
+    .site-footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--trace-border);
+      padding: 4.5rem 0 2.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .footer-brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.3rem;
+    }
+
+    .footer-tagline {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--neon-cyan);
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-inst-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .footer-address {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      line-height: 1.5;
+    }
+
+    .footer-col-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--teal-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-link-item {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: color var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .footer-link-item:hover {
+      color: var(--copper-bright);
+    }
+
+    .footer-bottom-bar {
+      border-top: 1px solid rgba(89, 171, 156, 0.18);
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .footer-silkscreen-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .hero-layout-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .timeline-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+      }
+
+      .timeline-trace-bar {
+        display: none;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .guide-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .top-bar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .countdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .timeline-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-bottom-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .filter-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box-wrapper {
+        max-width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- BACKGROUND PCB CIRCUIT CANVAS & HARDWARE GRID -->
+  <div class="hardware-grid-bg" aria-hidden="true"></div>
+  <canvas id="pcbCanvas" aria-hidden="true"></canvas>
+
+  <!-- ==========================================================================
+       TOP INSTITUTIONAL STRIP
+       ========================================================================== -->
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <span class="pcb-via" title="Via Point TP_INST"></span>
+        <span class="top-bar-college">PSG Institute of Technology and Applied Research</span>
+        <span class="top-bar-city">• Neelambur, Coimbatore–641062</span>
+      </div>
+      <div class="top-bar-right">
+        <span class="circuit-status-pulse">
+          <span class="pulse-led" aria-hidden="true"></span>
+          <span>ECE ASSOCIATION PRESENTS</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       STICKY NAVIGATION BAR (CLEAN DUAL LOGOS)
+       ========================================================================== -->
+  <nav class="site-nav" id="mainNav">
+    <div class="container nav-inner">
+
+      <!-- Brand & Logos -->
+      <a href="#" class="brand-group" aria-label="29th Solution Home">
+        <div class="brand-logos">
+          <!-- PSG iTech Logo -->
+          <div class="logo-frame-psg" title="PSG iTech College Shield Logo">
+            <img src="V:\ECE Association\PSG.png" alt="PSG iTech Logo" class="logo-img">
+          </div>
+
+          <!-- ECE Department Association 3D Emblem Logo -->
+          <div class="logo-frame-ece" title="ECE Department Association Logo">
+            <img src="V:\ECE Association\ECEA_LOGO.jpeg" alt="ECE Association Logo" class="logo-img-circle">
+          </div>
+        </div>
+
+        <div class="brand-text">
+          <div class="brand-title"> 29th Solution
+          </div>
+          <span class="brand-edition">EDITION1</span>
+
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="nav-links">
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#problems" class="nav-link">Problem Statements</a></li>
+        <li><a href="#timeline" class="nav-link">Timeline</a></li>
+        <li><a href="#submission-guide" class="nav-link">Submission Guidelines</a></li>
+        <li><a href="#guidelines" class="nav-link">Team Guidelines</a></li>
+        <li><a href="#evaluation" class="nav-link">Evaluation Criteria</a></li>
+      </ul>
+
+      <!-- Action Button -->
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <a href="https://forms.gle/56fXMWrzPSck6VXUA" class="btn btn-copper btn-sm">
+          <span>CLICK HERE TO SUBMIT YOUR IDEA</span>
+          <span class="pcb-via" style="border-color: #071512;"></span>
+        </a>
+
+        <!-- Mobile Hamburger Toggle -->
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div>
+      <div style="margin-bottom: 2rem;">
+        <div class="pcb-tag cyan" style="margin-bottom: 0.5rem;">SYS_BUS // NAVIGATION</div>
+        <div style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700;">29th Solution</div>
+        <div style="font-size: 0.85rem; color: var(--teal-light); font-family: var(--font-mono);">Edition 1 • ECE
+          Association</div>
+      </div>
+      <ul class="drawer-links">
+        <li><a href="#about" class="drawer-link"><span class="mono-id">01</span> About Event</a></li>
+        <li><a href="#problems" class="drawer-link"><span class="mono-id">02</span> Problem Statements (8)</a></li>
+        <li><a href="#timeline" class="drawer-link"><span class="mono-id">03</span> Event Timeline</a></li>
+        <li><a href="#guidelines" class="drawer-link"><span class="mono-id">04</span> Guidelines & Rules</a></li>
+        <li><a href="#submission-guide" class="drawer-link"><span class="mono-id">05</span> Submission Protocol</a></li>
+        <li><a href="#evaluation" class="drawer-link"><span class="mono-id">06</span> Evaluation Criteria</a></li>
+      </ul>
+    </div>
+    <div>
+      <a href="#submission-guide" class="btn btn-copper" style="width: 100%;" id="drawerSubmitLink">
+        Read Submission Guide
+      </a>
+      <div
+        style="margin-top: 1rem; text-align: center; font-family: var(--font-mono); font-size: 0.725rem; color: var(--text-dim);">
+        PSG iTech • Neelambur, Coimbatore
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       HERO SECTION WITH OSCILLOSCOPE & COUNTDOWN
+       ========================================================================== -->
+  <header class="hero-section" id="hero">
+    <div class="container hero-container">
+
+      <div class="hero-layout-grid">
+
+        <!-- Left Hero Content -->
+        <div>
+          <div class="hero-badge-strip">
+            <span class="pcb-tag cyan">
+              <span class="pcb-via"></span>
+              ECE Association Tech Challenge
+            </span>
+          </div>
+
+          <h1 class="hero-title">
+            29th Solution<br>
+            <span class="copper-glow"> Edition 1</span>
+          </h1>
+
+          <div class="hero-tagline">
+            <span>Think</span>
+            <span class="hero-tagline-dot">•</span>
+            <span>Innovate</span>
+            <span class="hero-tagline-dot">•</span>
+            <span>Solve</span>
+          </div>
+
+          <p class="hero-description">
+            A Tech Challenge hosted by
+            <strong>ECE Association of PSG Institute of Technology and Applied Research</strong>.
+            Tackle 7 curated departmental challenges or propose a campus-wide breakthrough under Open Innovation.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#submission-guide" class="btn btn-copper">
+              <span>Submission Guidelines</span>
+              <span class="pcb-via" style="border-color: #071512;"></span>
+            </a>
+            <a href="#problems" class="btn btn-cyan">
+              <span>Explore Problem Statements</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Oscilloscope & Telemetry Component -->
+        <div>
+          <div class="oscilloscope-card" role="region" aria-label="Real-time ECE Signal Telemetry">
+            <div class="scope-header">
+              <div class="scope-title">
+                <span class="pulse-led" aria-hidden="true"></span>
+                <span>DETAILS</span>
+              </div>
+            </div>
+
+
+
+            <div class="scope-meta-grid">
+              <div class="scope-meta-item">
+                <div class="scope-meta-label">PRIZE POOL</div>
+                <div class="scope-meta-val">₹5000</div>
+                <div class="scope-meta-label">Winners - ₹2500</div>
+                <div class="scope-meta-label">1st Runner Up - ₹1500</div>
+                <div class="scope-meta-label">2nd Runner Up - ₹1000</div>
+              </div>
+              <div class="scope-meta-item">
+                <div class="scope-meta-label">ABSTRACT SUBMISSION DEADLINE</div>
+                <div class="scope-meta-val">23/09/2026</div>
+                <div class="scope-meta-label">SHORTLIST ANNOUNCEMENT*</div>
+                <div class="scope-meta-val">26/09/2026</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LIVE JS COUNTDOWN TIMER -->
+      <div class="countdown-card" style="margin-top: 3rem;" role="region" aria-label="Submission Countdown Timer">
+        <div class="countdown-header">
+          <div class="countdown-label">
+            <span class="pulse-led" aria-hidden="true"></span>
+            <span>COUNTDOWN TO ABSTRACT SUBMISSION</span>
+          </div>
+          <div class="countdown-target-date">
+            Deadline: 23rd SEPTEMBER 2026 [23:59:59 IST]
+          </div>
+        </div>
+
+        <div class="countdown-grid">
+          <div class="countdown-unit">
+            <div class="countdown-number" id="cdDays">00</div>
+            <div class="countdown-unit-label">Days</div>
+          </div>
+          <div class="countdown-unit">
+            <div class="countdown-number" id="cdHours">00</div>
+            <div class="countdown-unit-label">Hours</div>
+          </div>
+          <div class="countdown-unit">
+            <div class="countdown-number" id="cdMinutes">00</div>
+            <div class="countdown-unit-label">Minutes</div>
+          </div>
+          <div class="countdown-unit">
+            <div class="countdown-number" id="cdSeconds">00</div>
+            <div class="countdown-unit-label">Seconds</div>
+          </div>
+        </div>
+
+        <div class="countdown-footer">
+          <span>STAGE_01 INITIAL SUBMISSION</span>
+          <span>IDEA & ABSTRACT</span>
+        </div>
+      </div>
+
+
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       ABOUT SECTION
+       ========================================================================== -->
+  <section class="section-padding" id="about">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="section-silk-label">
+          <span class="pcb-via"></span>
+          <span>MISSION & STRUCTURE</span>
+        </div>
+        <h2 class="section-title">Engineered to Solve Campus Realities</h2>
+        <p class="section-desc">
+          "29th Solution – Edition 1" bridges theoretical electronics engineering and real-world campus
+          implementation.
+        </p>
+      </div>
+
+      <div class="about-grid">
+
+        <!-- Left Explanation Card -->
+        <div class="about-content-card">
+          <p>
+            Hosted by the <strong>ECE Association of PSG Institute of Technology and Applied Research</strong>,
+            this initiative challenges students to build deployable systems using embedded controllers, sensor networks,
+            signal analysis, IoT, and intelligent software to eliminate day-to-day operational pain points.
+          </p>
+
+          <p>
+            Teams can either select one of the <strong>7 pre-identified problem statements</strong> curated directly by
+            the
+            ECE Association or pioneer a novel hardware/software concept under <strong>Track 8: Open
+              Innovation</strong>.
+          </p>
+
+          <div class="about-quote-box">
+            <div class="about-quote-title">THE CORE MANTRA</div>
+            <div class="about-quote-text">"Think. Innovate. Solve."</div>
+          </div>
+
+          <p>
+            The hackathon runs in four well-defined stages:
+            <strong>Stage 1: Idea Submission</strong>, Tests your understanding and feasibility via an Idea Abstract.
+            <strong>Stage 2: Shortlisting</strong>, The ideas are evaluated and shortlisted by faculty and experts.
+            <strong>Stage 3: Prototype Build</strong>, Shortlisted teams transform their concepts into physical
+            prototypes.
+            <strong>Stage 4: Final Display</strong>, Shortlisted teams demonstrate their working prototype to jury.
+          </p>
+        </div>
+
+        <!-- Right Specs Stack -->
+        <div class="about-specs-stack">
+
+          <div class="spec-block">
+            <h3 class="spec-block-title">Department Exclusivity</h3>
+            <p class="spec-block-desc">
+              All team members must be ECE students at PSG iTech. Teams can comprise students across 1st, 2nd, 3rd, and
+              4th years to encourage peer learning.
+            </p>
+          </div>
+
+          <div class="spec-block">
+            <h3 class="spec-block-title">Track Structure</h3>
+            <p class="spec-block-desc">
+              Choose from the official 7 departmental problem statements or identify an unaddressed challenge on campus
+              under Open Innovation.
+            </p>
+          </div>
+
+          <div class="spec-block">
+            <h3 class="spec-block-title">Zero Initial Prototyping Barrier</h3>
+            <p class="spec-block-desc">
+              No hardware assembly or component purchase is required for initial shortlisting. Submit your circuit
+              simulation, architecture, or code proof to advance.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PROBLEM STATEMENTS SECTION (ALL 8 COMPLETE STATEMENTS)
+       ========================================================================== -->
+  <section class="section-padding problems-section" id="problems">
+    <div class="container">
+
+      <div class="section-header">
+        <h2 class="section-title">Problem Statements</h2>
+        <p class="section-desc">
+          Select one challenge from the curated departmental list below or propose a custom problem under Open
+          Innovation.
+        </p>
+      </div>
+
+      <!-- Filter & Search Toolbar -->
+      <div class="filter-toolbar">
+        <div class="category-tabs" role="tablist">
+          <button type="button" class="filter-tab active" data-filter="all">ALL (8)</button>
+          <button type="button" class="filter-tab" data-filter="hardware">HARDWARE & IOT</button>
+          <button type="button" class="filter-tab" data-filter="smart">SMART AUTOMATION</button>
+          <button type="button" class="filter-tab" data-filter="platform">STUDENT LIFE & WEB</button>
+          <button type="button" class="filter-tab" data-filter="open">OPEN INNOVATION</button>
+        </div>
+
+        <div class="search-box-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="psSearchInput" class="search-input" placeholder="Search problems, keywords..."
+            aria-label="Search Problem Statements">
+        </div>
+      </div>
+
+      <!-- Problems Grid -->
+      <div class="problems-grid" id="problemsGrid">
+
+        <!-- PS 1 -->
+        <article class="problem-card" data-category="hardware" data-id="1">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS01</span>
+              <span class="problem-domain">RF & Audio • IoT</span>
+            </div>
+            <h3 class="problem-title">Smart Mic Battery & Interference Alert</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> During classes and events, microphones may suddenly stop because their battery
+              level is unknown. This causes interruptions, delays, and sometimes audio interference.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS01: Smart Mic Battery & Interference Alert - During classes and events, microphones may suddenly stop because their battery level is unknown. This causes interruptions, delays, and sometimes audio interference.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 2 -->
+        <article class="problem-card" data-category="hardware" data-id="2">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS02</span>
+              <span class="problem-domain">Lab Inventory • Sensors</span>
+            </div>
+            <h3 class="problem-title">Lab Equipment Management System</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Tracking laboratory equipment, its availability, usage, maintenance status, and
+              damaged or missing items is often difficult with manual records.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS02: Lab Equipment Management System - Tracking laboratory equipment, its availability, usage, maintenance status, and damaged or missing items is often difficult with manual records.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 3 -->
+        <article class="problem-card" data-category="smart" data-id="3">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS03</span>
+              <span class="problem-domain">Computer Vision • Embedded</span>
+            </div>
+            <h3 class="problem-title">Smart Attendance & Classroom Verification</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Manual attendance consumes valuable class time, while proxy attendance can make
+              conventional attendance systems unreliable.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS03: Smart Attendance & Classroom Verification - Manual attendance consumes valuable class time, while proxy attendance can make conventional attendance systems unreliable.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 4 -->
+        <article class="problem-card" data-category="platform" data-id="4">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS04</span>
+              <span class="problem-domain">Web Systems • Peer Collab</span>
+            </div>
+            <h3 class="problem-title">Hackathon Team Formation & Notes Sharing Platform</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Students often struggle to find suitable hackathon teammates based on skills and
+              interests, while useful notes and resources are scattered across different platforms.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS04: Hackathon Team Formation & Notes Sharing Platform - Students often struggle to find suitable hackathon teammates based on skills and interests, while useful notes and resources are scattered across different platforms.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 5 -->
+        <article class="problem-card" data-category="hardware" data-id="5">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS05</span>
+              <span class="problem-domain">Power & Energy • Relays</span>
+            </div>
+            <h3 class="problem-title">Campus Electricity Waste</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Lights, fans, and ACs are often left running in empty classrooms, causing
+              unnecessary electricity consumption and increased costs.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS05: Campus Electricity Waste - Lights, fans, and ACs are often left running in empty classrooms, causing unnecessary electricity consumption and increased costs.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 6 -->
+        <article class="problem-card" data-category="platform" data-id="6">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS06</span>
+              <span class="problem-domain">Gamification • OCR</span>
+            </div>
+            <h3 class="problem-title">Certificate Collection & Incentivization</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Students participate in various extracurricular and co-curricular activities,
+              but many do not submit or update their certificates in the college's existing Excel-based records. This
+              makes it difficult to maintain a complete record of student achievements. Develop an engaging solution
+              that encourages students to submit their certificates through rewards, recognition, gamification, or other
+              innovative incentives.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS06: Certificate Collection - Students participate in various extracurricular and co-curricular activities, but many do not submit or update their certificates in the college's existing Excel-based records. Develop an engaging solution that encourages students to submit their certificates through rewards, recognition, gamification, or other innovative incentives.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 7 -->
+        <article class="problem-card" data-category="smart" data-id="7">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id">ECE-PS07</span>
+              <span class="problem-domain">AI Matching • Logistics</span>
+            </div>
+            <h3 class="problem-title">Lost & Found Intelligence</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Lost items on campus rarely reach their owners because there is no centralized,
+              smart matching system.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS07: Lost & Found Intelligence - Lost items on campus rarely reach their owners because there is no centralized, smart matching system.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+        <!-- PS 8 -->
+        <article class="problem-card open-innovation" data-category="open" data-id="8">
+          <div>
+            <div class="problem-header">
+              <span class="problem-id"
+                style="background: rgba(0, 212, 255, 0.2); color: var(--neon-cyan); border-color: var(--cyan-border);">ECE-PS08</span>
+              <span class="problem-domain" style="color: var(--copper-bright);">Open Innovation</span>
+            </div>
+            <h3 class="problem-title">Open Innovation – Identify & Solve a Campus Problem</h3>
+            <p class="problem-statement-text">
+              <strong>Problem:</strong> Identify a real, practical problem faced by students, faculty, staff, or the
+              campus community that is not covered by the above problem statements.
+            </p>
+          </div>
+          <div class="problem-card-footer">
+            <button type="button" class="copy-statement-btn"
+              data-copy="ECE-PS08: Open Innovation – Identify & Solve a Campus Problem - Identify a real, practical problem faced by students, faculty, staff, or the campus community that is not covered by the above problem statements.">
+              <span>📋 Copy Statement</span>
+            </button>
+            <a href="#submission-guide" class="btn btn-outline btn-sm">
+              Submission Guide →
+            </a>
+          </div>
+        </article>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       TIMELINE SECTION (4 CONNECTED STAGES)
+       ========================================================================== -->
+  <section class="section-padding" id="timeline">
+    <div class="container">
+
+      <div class="section-header">
+        <div class="section-silk-label">
+          <span class="pcb-via"></span>
+          <span>TRACE_CHRONOLOGY // EVENT TIMELINE</span>
+        </div>
+        <h2 class="section-title">Four Stages of Innovation</h2>
+        <p class="section-desc">
+          Follow the signal path from initial idea concept & submission to working prototype
+          building.
+        </p>
+      </div>
+
+      <div class="timeline-wrapper">
+        <div class="timeline-trace-bar" aria-hidden="true"></div>
+
+        <div class="timeline-grid">
+
+          <!-- Stage 1 -->
+          <div class="timeline-card active-stage">
+            <div class="timeline-node-pin">01</div>
+            <div class="timeline-stage-tag">STAGE_01</div>
+            <h3 class="timeline-title">Initial Submission</h3>
+            <div class="timeline-date-chip">DEADLINE: 23/09/2026</div>
+            <p class="timeline-desc">
+              Submit your idea abstract and Proof of Concept (If possible). PoC can be a circuit simulation
+              (Proteus/Tinkercad),
+              architecture diagram, mock-up, or bench-test verification.
+            </p>
+          </div>
+
+          <!-- Stage 2 -->
+          <div class="timeline-card">
+            <div class="timeline-node-pin">02</div>
+            <div class="timeline-stage-tag">STAGE_02</div>
+            <h3 class="timeline-title">Technical Shortlisting</h3>
+            <div class="timeline-date-chip">EVALUATION PHASE</div>
+            <p class="timeline-desc">
+              The ECE Association jury screens submissions based on problem understanding, innovation, technical
+              feasibility. Qualified teams advance.
+            </p>
+          </div>
+
+          <!-- Stage 3 -->
+          <div class="timeline-card">
+            <div class="timeline-node-pin">03</div>
+            <div class="timeline-stage-tag">STAGE_03</div>
+            <h3 class="timeline-title">Build Prototype</h3>
+            <div class="timeline-date-chip">BUILD PHASE</div>
+            <p class="timeline-desc">
+              Shortlisted teams transform their concepts into physical prototypes for the Final Display,
+            </p>
+          </div>
+
+          <!-- Stage 4 -->
+          <div class="timeline-card">
+            <div class="timeline-node-pin">04</div>
+            <div class="timeline-stage-tag">STAGE_04</div>
+            <h3 class="timeline-title">Final Display</h3>
+            <div class="timeline-date-chip">GRAND FINALE</div>
+            <p class="timeline-desc">
+              Finalist squads present their working physical prototype live before the faculty and expert evaluation
+              committee.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SUBMISSION INSTRUCTION & PROTOCOL GUIDE (EXPLAINS EVERYTHING CLEARLY)
+       ========================================================================== -->
+  <section class="section-padding submission-guide-section" id="submission-guide">
+    <div class="container">
+
+      <div class="section-header">
+        <h2 class="section-title">Everything You Need to know before Submission</h2>
+      </div>
+
+      <div class="guide-columns">
+
+        <!-- Left: Steps & Instructions -->
+        <div class="protocol-card">
+          <div class="pcb-tag cyan" style="margin-bottom: 0.75rem;">STAGE 1 SUBMISSION CHECKLIST</div>
+          <h3
+            style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--text-main); margin-bottom: 1rem;">
+            Initial Submission (Deadline: 23/09/2026)
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+            Teams must compile their solution into a clean document or slide (ppt).
+          </p>
+
+          <ul class="step-list">
+
+            <li class="step-item">
+              <div class="step-num-badge">01</div>
+              <div>
+                <div class="step-content-title">Choose Problem Statement</div>
+                <div class="step-content-desc">
+                  Select one statement from the curated ECE Association list (ECE-PS01 to ECE-PS07) or define your own
+                  challenge under ECE-PS08 (Open Innovation).
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <div class="step-num-badge">02</div>
+              <div>
+                <div class="step-content-title">Draft Idea Abstract & Architecture</div>
+                <div class="step-content-desc">
+                  Outline the problem context, root cause, proposed engineering methodology, block diagram, and expected
+                  hardware components (e.g. ESP32, PIR sensors, LoRa, RF modules).
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <div class="step-num-badge">03</div>
+              <div>
+                <div class="step-content-title">Build Proof of Concept (PoC) [If Possible]</div>
+                <div class="step-content-desc">
+                  Demonstrate feasibility without assembling full hardware. Acceptable PoCs include:
+                  <strong>Circuit simulations</strong> (Proteus / TinkerCAD / MATLAB), <strong>architectural
+                    schematics</strong>, <strong>UI/UX wireframes</strong>, or <strong>preliminary code on
+                    GitHub</strong>.
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <div class="step-num-badge">04</div>
+              <div>
+                <div class="step-content-title">Submit to LINK in the website</div>
+                <div class="step-content-desc">
+                  Upload your proposal document before <strong>23 September 2026, 23:59:59
+                    IST</strong> through the official department submission form.
+                </div>
+              </div>
+            </li>
+
+          </ul>
+
+          <div
+            style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed rgba(89, 171, 156, 0.25); display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-copper btn-sm" id="copyTemplateBtn">
+              <a
+                href="https://docs.google.com/presentation/d/1bU5iBlurMhlCIXhPwO8nitEfmvv0xqP_/edit?usp=sharing&ouid=114916748085049750946&rtpof=true&sd=true">CLICK
+                HERE TO VIEW & DOWNLOAD TEMPLATE</a>
+            </button>
+            <a href="#problems" class="btn btn-outline btn-sm">
+              Review Problem Statements
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       GUIDELINES SECTION (ACCESSIBLE ACCORDION)
+       ========================================================================== -->
+  <section class="section-padding" id="guidelines"
+    style="background: rgba(7, 21, 18, 0.45); border-top: 1px solid var(--trace-border);">
+    <div class="container">
+
+      <div class="section-header" style="text-align: center; max-width: 780px; margin-left: auto; margin-right: auto;">
+        <h2 class="section-title">Rules & Participation Guidelines</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Everything you need to know about team structure, eligibility, original submission requirements, and prototype
+          expectations.
+        </p>
+      </div>
+
+      <div class="guidelines-wrapper" id="guidelinesAccordion" role="region"
+        aria-label="Hackathon Guidelines Accordion">
+
+        <!-- Accordion Item 1: Team Size -->
+        <div class="accordion-item open">
+          <button class="accordion-header" aria-expanded="true" aria-controls="rule1Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">01</span>
+              <span class="accordion-label">Team Size: 3–5 Members per Team</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule1Content" style="max-height: 250px;">
+            <div class="accordion-body-content">
+              Each team must consist of a minimum of <strong>3 members</strong> and a maximum of <strong>5
+                members</strong>. Solo entries and teams exceeding 5 members are strictly not permitted to ensure
+              balanced collaboration. Each individual may participate in only one team.
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Item 2: Team Composition -->
+        <div class="accordion-item">
+          <button class="accordion-header" aria-expanded="false" aria-controls="rule2Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">02</span>
+              <span class="accordion-label">Team Composition: Only ECE Students (Any Year)</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule2Content">
+            <div class="accordion-body-content">
+              <strong>All team members must be students of the ECE Department</strong> at PSG Institute of Technology
+              and Applied Research. Members can be from any year of study (1st, 2nd, 3rd, or Final year). Inter-year
+              teams combining seniors and juniors are encouraged.
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Item 3: Problem Selection -->
+        <div class="accordion-item">
+          <button class="accordion-header" aria-expanded="false" aria-controls="rule3Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">03</span>
+              <span class="accordion-label">Problem Selection: Curated List or Open Innovation</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule3Content">
+            <div class="accordion-body-content">
+              Teams must choose <strong>one problem statement</strong> from the given list (ECE-PS01 to ECE-PS07).
+              Alternatively, under <strong>Open Innovation (ECE-PS08)</strong>, teams may independently identify and
+              frame a real, practical challenge faced by the campus community.
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Item 4: Initial Submission -->
+        <div class="accordion-item">
+          <button class="accordion-header" aria-expanded="false" aria-controls="rule4Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">04</span>
+              <span class="accordion-label">Initial Submission: Idea</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule4Content">
+            <div class="accordion-body-content">
+              Submit your idea summary along with a <strong>Proof of Concept (PoC) [IF Possible]</strong> on or before
+              <strong>23/09/2026</strong>. The PoC demonstrates the viability of your design and can include circuit
+              simulations, block diagrams, pseudocode, UI wireframes, or preliminary test data.
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Accordion Item 5: Member Guide -->
+        <div class="accordion-item">
+          <button class="accordion-header" aria-expanded="false" aria-controls="rule4Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">06</span>
+              <span class="accordion-label">One Idea, One Team</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule4Content">
+            <div class="accordion-body-content">
+              Each team may submit only one idea. Multiple idea submissions or
+              participation of an individual in multiple teams are not permitted.
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Item 6: Prototype Timing -->
+        <div class="accordion-item">
+          <button class="accordion-header" aria-expanded="false" aria-controls="rule5Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">06</span>
+              <span class="accordion-label">Prototype Timing: Only Required for Shortlisted Finalists</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule5Content">
+            <div class="accordion-body-content">
+              <strong>A working prototype is NOT required for the initial submission.</strong> Do not rush to assemble
+              physical hardware before shortlisting. Only teams shortlisted after the Round 1 evaluation will be called
+              upon to develop a functional working prototype for the <strong>Final Display</strong>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Item 7: Originality & Open Source -->
+        <div class="accordion-item">
+          <button class="accordion-header" aria-expanded="false" aria-controls="rule6Content">
+            <div class="accordion-header-left">
+              <span class="accordion-num">07</span>
+              <span class="accordion-label">Originality: Original Ideas with Open-Source & Existing Modules
+                Allowed</span>
+            </div>
+            <span class="accordion-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="accordion-body" id="rule6Content">
+            <div class="accordion-body-content">
+              The proposed engineering solution and implementation must be <strong>original work</strong>. You are
+              completely permitted and encouraged to leverage existing technologies, microcontroller boards, sensor
+              modules, communication APIs, and open-source libraries to build upon.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       EVALUATION CRITERIA (6 ITEMS GRID)
+       ========================================================================== -->
+  <section class="section-padding" id="evaluation">
+    <div class="container">
+
+      <div class="section-header">
+        <h2 class="section-title">Evaluation Criteria</h2>
+        <p class="section-desc">
+          Every submission and subsequent prototype demonstration is objectively measured across six key technical
+          pillars.
+        </p>
+      </div>
+
+      <div class="evaluation-grid">
+
+        <!-- Criteria 1 -->
+        <div class="eval-card">
+          <div class="eval-pin-header">
+            <span class="eval-component-id">CRIT_01 // FOUNDATION</span>
+          </div>
+          <h3 class="eval-title">Problem Understanding</h3>
+          <p class="eval-desc">
+            Clarity in defining the root cause of the problem, operational pain-points, stakeholder context, and campus
+            relevance.
+          </p>
+        </div>
+
+        <!-- Criteria 2 -->
+        <div class="eval-card">
+          <div class="eval-pin-header">
+            <span class="eval-component-id">CRIT_02 // CREATIVITY</span>
+          </div>
+          <h3 class="eval-title">Innovation</h3>
+          <p class="eval-desc">
+            Novelty of the solution approach, creative hardware/software architecture, and differentiation from trivial
+            or existing methods.
+          </p>
+        </div>
+
+        <!-- Criteria 3 -->
+        <div class="eval-card">
+          <div class="eval-pin-header">
+            <span class="eval-component-id">CRIT_03 // VIABILITY</span>
+          </div>
+          <h3 class="eval-title">Feasibility</h3>
+          <p class="eval-desc">
+            Realistic implementation within constraints, component availability, budget practicality, power consumption,
+            and deployability.
+          </p>
+        </div>
+
+        <!-- Criteria 4 -->
+        <div class="eval-card">
+          <div class="eval-pin-header">
+            <span class="eval-component-id">CRIT_04 // OUTCOME</span>
+          </div>
+          <h3 class="eval-title">Practical Impact</h3>
+          <p class="eval-desc">
+            Measurable positive impact on campus operations, energy savings, reliability enhancement, or user
+            convenience for students and faculty.
+          </p>
+        </div>
+
+        <!-- Criteria 5 -->
+        <div class="eval-card">
+          <div class="eval-pin-header">
+            <span class="eval-component-id">CRIT_05 // SCALABLE</span>
+          </div>
+          <h3 class="eval-title">Scalability and Adaptability</h3>
+          <p class="eval-desc">
+            Potential to expand, adapt, or integrate the solution for larger deployments, additional use cases, or
+            future improvements.
+          </p>
+        </div>
+
+        <!-- Criteria 6 -->
+        <div class="eval-card">
+          <div class="eval-pin-header">
+            <span class="eval-component-id">CRIT_06 // Presentation</span>
+            <span class="eval-score-weight">For Finale</span>
+          </div>
+          <h3 class="eval-title">Presentation</h3>
+          <p class="eval-desc">
+            Articulation during question-and-answer session, technical confidence, schematic clarity, and live prototype
+            demonstration at Final Display.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Closing Call-to-Action Box -->
+      <div class="closing-panel">
+        <div class="pcb-tag copper" style="margin-bottom: 1rem;">FINAL CALL FOR CIRCUITS</div>
+        <h2 class="closing-title">Ready to Power Up Your Solution?</h2>
+        <p class="closing-desc">
+          Assemble your ECE team, pick your challenge, and submit your idea abstract with Proof of Concept before the
+          clock runs out on 23 September 2026.
+        </p>
+        <div class="closing-btns">
+          <a href="https://forms.gle/jhKMCJuAqGjhyv2c9" class="btn btn-copper">
+            <span>CLICK HERE TO SUBMIT YOUR IDEA</span>
+            <span class="pcb-via" style="border-color: #071512;"></span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- ==========================================================================
+       SITE FOOTER (ONLY CLEAN OFFICIAL LOGOS)
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+
+      <div class="footer-grid">
+
+        <!-- Col 1: Institutional Details & Official Logos -->
+        <div>
+          <div class="footer-brand-logos">
+            <!-- PSG Shield Logo -->
+            <div class="logo-frame-psg" title="PSG iTech College Shield Logo">
+              <img src="V:\ECE Association\PSG.png" alt="PSG iTech Logo" class="logo-img">
+            </div>
+            <!-- ECE Association 3D Emblem Logo -->
+            <div class="logo-frame-ece" title="ECE Department Association Logo">
+              <img src="V:\ECE Association\ECEA_LOGO.jpeg" alt="ECE Association Logo" class="logo-img-circle">
+            </div>
+          </div>
+
+          <h3 class="footer-brand-title">29th Solution – Edition 1</h3>
+          <div class="footer-tagline">"Think. Innovate. Solve."</div>
+
+          <div class="footer-inst-name">PSG Institute of Technology and Applied Research</div>
+          <div class="footer-address">
+            Avinashi Road, Neelambur,<br>
+            Coimbatore – 641062, Tamil Nadu, India.
+          </div>
+        </div>
+
+        <!-- Col 2: Navigation Links -->
+        <div>
+          <div class="footer-col-title">Navigation Signals</div>
+          <ul class="footer-links-list">
+            <li><a href="#hero" class="footer-link-item">↳ Top of Board</a></li>
+            <li><a href="#about" class="footer-link-item">↳ About Hackathon</a></li>
+            <li><a href="#problems" class="footer-link-item">↳ Problem Statements (8)</a></li>
+            <li><a href="#timeline" class="footer-link-item">↳ Timeline</a></li>
+            <li><a href="#submission-guide" class="footer-link-item">↳ Submission Guidelines</a></li>
+            <li><a href="#guidelines" class="footer-link-item">↳ Team Guidelines & Rules</a></li>
+            <li><a href="#evaluation" class="footer-link-item">↳ Evaluation Criteria</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Department Association -->
+        <div>
+          <div class="footer-col-title">Organizing Body</div>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6;">
+            Organized by the <strong>ECE Association</strong>,<br>
+            Department of Electronics & Communication Engineering.
+          </p>
+          <div class="pcb-tag cyan" style="margin-bottom: 0.75rem;">DEPARTMENT HOST: ECE</div>
+
+        </div>
+
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom-bar">
+        <div>
+          © 2026 ECE Association, PSG Institute of Technology and Applied Research. All rights reserved.
+        </div>
+        <div class="footer-silkscreen-meta">
+          <span>BUILT FOR ELECTRONICS & COMMUNICATION ENGINEERS</span>
+          <span>BUILT BY ELECTRONICS & COMMUNICATION ENGINEERS</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       VANILLA JAVASCRIPT: ECE CANVAS, OSCILLOSCOPE, COUNTDOWN & INTERACTION
+       ========================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // ==========================================================================
+      // 1. ANIMATED PCB CIRCUIT BOARD CANVAS (BACKGROUND ECE SIGNALS)
+      // ==========================================================================
+      const pcbCanvas = document.getElementById('pcbCanvas');
+      const pcbCtx = pcbCanvas ? pcbCanvas.getContext('2d') : null;
+
+      let width = 0;
+      let height = 0;
+      let traces = [];
+      let pulses = [];
+
+      function resizeCanvas() {
+        if (!pcbCanvas) return;
+        width = pcbCanvas.width = window.innerWidth;
+        height = pcbCanvas.height = window.innerHeight;
+        initTraces();
+      }
+
+      function initTraces() {
+        traces = [];
+        pulses = [];
+        const traceCount = Math.floor(width / 130);
+
+        for (let i = 0; i < traceCount; i++) {
+          const startX = Math.random() * width;
+          const startY = Math.random() * height;
+          const length = 180 + Math.random() * 240;
+          const isHorizontal = Math.random() > 0.5;
+
+          const points = [{ x: startX, y: startY }];
+
+          if (isHorizontal) {
+            const midX = startX + (Math.random() > 0.5 ? 1 : -1) * (length * 0.6);
+            points.push({ x: midX, y: startY });
+            const endX = midX + (Math.random() > 0.5 ? 50 : -50);
+            const endY = startY + (Math.random() > 0.5 ? 50 : -50);
+            points.push({ x: endX, y: endY });
+          } else {
+            const midY = startY + (Math.random() > 0.5 ? 1 : -1) * (length * 0.6);
+            points.push({ x: startX, y: midY });
+            const endX = startX + (Math.random() > 0.5 ? 50 : -50);
+            const endY = midY + (Math.random() > 0.5 ? 50 : -50);
+            points.push({ x: endX, y: endY });
+          }
+
+          traces.push(points);
+
+          pulses.push({
+            traceIndex: i,
+            progress: Math.random(),
+            speed: 0.002 + Math.random() * 0.004,
+            color: Math.random() > 0.4 ? '#00d4ff' : '#f0a359'
+          });
+        }
+      }
+
+      function renderPcbTraces() {
+        if (!pcbCtx) return;
+        pcbCtx.clearRect(0, 0, width, height);
+
+        pcbCtx.lineWidth = 1.5;
+        for (let i = 0; i < traces.length; i++) {
+          const pts = traces[i];
+          pcbCtx.strokeStyle = 'rgba(89, 171, 156, 0.14)';
+          pcbCtx.beginPath();
+          pcbCtx.moveTo(pts[0].x, pts[0].y);
+          for (let j = 1; j < pts.length; j++) {
+            pcbCtx.lineTo(pts[j].x, pts[j].y);
+          }
+          pcbCtx.stroke();
+
+          pcbCtx.fillStyle = 'rgba(207, 138, 76, 0.3)';
+          pcbCtx.beginPath();
+          pcbCtx.arc(pts[pts.length - 1].x, pts[pts.length - 1].y, 3, 0, Math.PI * 2);
+          pcbCtx.fill();
+        }
+
+        for (let i = 0; i < pulses.length; i++) {
+          const p = pulses[i];
+          p.progress += p.speed;
+          if (p.progress > 1) p.progress = 0;
+
+          const pts = traces[p.traceIndex];
+          if (!pts) continue;
+
+          const totalSegments = pts.length - 1;
+          const segProgress = p.progress * totalSegments;
+          const segIdx = Math.floor(segProgress);
+          const segT = segProgress - segIdx;
+
+          if (pts[segIdx] && pts[segIdx + 1]) {
+            const curX = pts[segIdx].x + (pts[segIdx + 1].x - pts[segIdx].x) * segT;
+            const curY = pts[segIdx].y + (pts[segIdx + 1].y - pts[segIdx].y) * segT;
+
+            pcbCtx.shadowColor = p.color;
+            pcbCtx.shadowBlur = 8;
+            pcbCtx.fillStyle = p.color;
+            pcbCtx.beginPath();
+            pcbCtx.arc(curX, curY, 2.5, 0, Math.PI * 2);
+            pcbCtx.fill();
+            pcbCtx.shadowBlur = 0;
+          }
+        }
+
+        requestAnimationFrame(renderPcbTraces);
+      }
+
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+      resizeCanvas();
+      requestAnimationFrame(renderPcbTraces);
+
+      // ==========================================================================
+      // 2. OSCILLOSCOPE MONITOR WAVEFORM CANVAS
+      // ==========================================================================
+      const waveCanvas = document.getElementById('waveCanvas');
+      const waveCtx = waveCanvas ? waveCanvas.getContext('2d') : null;
+      let wavePhase = 0;
+
+      function renderOscilloscope() {
+        if (!waveCtx || !waveCanvas) return;
+        const w = waveCanvas.width = waveCanvas.offsetWidth;
+        const h = waveCanvas.height = waveCanvas.offsetHeight;
+
+        waveCtx.fillStyle = '#030e0b';
+        waveCtx.fillRect(0, 0, w, h);
+
+        waveCtx.strokeStyle = 'rgba(0, 212, 255, 0.08)';
+        waveCtx.lineWidth = 1;
+        const gridStep = 24;
+
+        for (let x = 0; x < w; x += gridStep) {
+          waveCtx.beginPath();
+          waveCtx.moveTo(x, 0);
+          waveCtx.lineTo(x, h);
+          waveCtx.stroke();
+        }
+
+        for (let y = 0; y < h; y += gridStep) {
+          waveCtx.beginPath();
+          waveCtx.moveTo(0, y);
+          waveCtx.lineTo(w, y);
+          waveCtx.stroke();
+        }
+
+        waveCtx.strokeStyle = 'rgba(0, 212, 255, 0.2)';
+        waveCtx.beginPath();
+        waveCtx.moveTo(0, h / 2);
+        waveCtx.lineTo(w, h / 2);
+        waveCtx.stroke();
+
+        waveCtx.shadowColor = '#00d4ff';
+        waveCtx.shadowBlur = 8;
+        waveCtx.strokeStyle = '#00d4ff';
+        waveCtx.lineWidth = 2;
+
+        waveCtx.beginPath();
+        for (let x = 0; x < w; x++) {
+          const freq1 = 0.04;
+          const freq2 = 0.08;
+          const y = h / 2 +
+            Math.sin(x * freq1 + wavePhase) * 32 +
+            Math.sin(x * freq2 + wavePhase * 1.5) * 12;
+          if (x === 0) {
+            waveCtx.moveTo(x, y);
+          } else {
+            waveCtx.lineTo(x, y);
+          }
+        }
+        waveCtx.stroke();
+        waveCtx.shadowBlur = 0;
+
+        wavePhase += 0.07;
+        requestAnimationFrame(renderOscilloscope);
+      }
+
+      requestAnimationFrame(renderOscilloscope);
+
+      // ==========================================================================
+      // 3. LIVE JS COUNTDOWN TIMER (23 September 2026, 23:59:59 IST)
+      // ==========================================================================
+      const targetDeadline = new Date('2026-09-23T23:59:59+05:30').getTime();
+
+      const elDays = document.getElementById('cdDays');
+      const elHours = document.getElementById('cdHours');
+      const elMins = document.getElementById('cdMinutes');
+      const elSecs = document.getElementById('cdSeconds');
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDeadline - now;
+
+        if (distance <= 0) {
+          if (elDays) elDays.textContent = '00';
+          if (elHours) elHours.textContent = '00';
+          if (elMins) elMins.textContent = '00';
+          if (elSecs) elSecs.textContent = '00';
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        if (elDays) elDays.textContent = String(days).padStart(2, '0');
+        if (elHours) elHours.textContent = String(hours).padStart(2, '0');
+        if (elMins) elMins.textContent = String(minutes).padStart(2, '0');
+        if (elSecs) elSecs.textContent = String(seconds).padStart(2, '0');
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+
+      // ==========================================================================
+      // 4. STICKY NAVBAR SCROLL SPY
+      // ==========================================================================
+      const mainNav = document.getElementById('mainNav');
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sections = document.querySelectorAll('section[id], header[id="hero"]');
+
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 40) {
+          mainNav.classList.add('scrolled');
+        } else {
+          mainNav.classList.remove('scrolled');
+        }
+
+        let currentSectionId = '';
+        sections.forEach((sec) => {
+          const sectionTop = sec.offsetTop - 120;
+          const sectionHeight = sec.offsetHeight;
+          if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+            currentSectionId = sec.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach((link) => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${currentSectionId}`) {
+            link.classList.add('active');
+          }
+        });
+      }, { passive: true });
+
+      // ==========================================================================
+      // 5. MOBILE DRAWER NAVIGATION
+      // ==========================================================================
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const mobileDrawer = document.getElementById('mobileDrawer');
+      const drawerBackdrop = document.getElementById('drawerBackdrop');
+      const drawerLinks = document.querySelectorAll('.drawer-link, #drawerSubmitLink');
+
+      function openDrawer() {
+        hamburgerBtn.classList.add('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+        mobileDrawer.classList.add('open');
+        mobileDrawer.setAttribute('aria-hidden', 'false');
+        drawerBackdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        hamburgerBtn.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        mobileDrawer.classList.remove('open');
+        mobileDrawer.setAttribute('aria-hidden', 'true');
+        drawerBackdrop.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', () => {
+          const isOpen = hamburgerBtn.classList.contains('open');
+          if (isOpen) closeDrawer();
+          else openDrawer();
+        });
+      }
+
+      if (drawerBackdrop) {
+        drawerBackdrop.addEventListener('click', closeDrawer);
+      }
+
+      drawerLinks.forEach((link) => {
+        link.addEventListener('click', closeDrawer);
+      });
+
+      // ==========================================================================
+      // 6. TOAST NOTIFICATION UTILITY
+      // ==========================================================================
+      const toastContainer = document.getElementById('toastContainer');
+
+      function showToast(message) {
+        if (!toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<span class="pcb-via"></span><span>${message}</span>`;
+        toastContainer.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.add('show');
+        });
+
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.parentNode.removeChild(toast);
+            }
+          }, 300);
+        }, 3500);
+      }
+
+      // ==========================================================================
+      // 7. PROBLEM STATEMENTS FILTER & SEARCH
+      // ==========================================================================
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      const psSearchInput = document.getElementById('psSearchInput');
+      const problemCards = document.querySelectorAll('.problem-card');
+
+      let currentFilter = 'all';
+      let currentQuery = '';
+
+      function filterProblems() {
+        problemCards.forEach((card) => {
+          const category = card.getAttribute('data-category');
+          const cardText = card.textContent.toLowerCase();
+
+          const matchesCategory = (currentFilter === 'all') || (category === currentFilter);
+          const matchesSearch = !currentQuery || cardText.includes(currentQuery);
+
+          if (matchesCategory && matchesSearch) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      filterTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          filterTabs.forEach((t) => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentFilter = tab.getAttribute('data-filter');
+          filterProblems();
+        });
+      });
+
+      if (psSearchInput) {
+        psSearchInput.addEventListener('input', (e) => {
+          currentQuery = e.target.value.trim().toLowerCase();
+          filterProblems();
+        });
+      }
+
+      // Copy Statement button listener
+      document.querySelectorAll('.copy-statement-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const textToCopy = btn.getAttribute('data-copy');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              showToast('Problem Statement copied to clipboard!');
+            }).catch(() => {
+              showToast('Statement ready: ' + textToCopy.slice(0, 45) + '...');
+            });
+          } else {
+            showToast('Statement ready for proposal draft.');
+          }
+        });
+      });
+
+      // Copy Proposal Template Button
+      const copyTemplateBtn = document.getElementById('copyTemplateBtn');
+      if (copyTemplateBtn) {
+        copyTemplateBtn.addEventListener('click', () => {
+          const templateContent = `# 29th Solution – Proposal Document\n\n## 1. Team & Problem Info\n- **Team Name**: [Your Squad Name]\n- **Team Size**: 3–5 Members (All ECE Dept)\n- **Year(s)**: [1st / 2nd / 3rd / 4th Year]\n- **Chosen Problem**: [e.g. ECE-PS01 / ECE-PS05 / Open Innovation]\n\n## 2. Problem Understanding\n- Root cause & pain point identified in campus / labs\n- Target stakeholders & operational context\n\n## 3. Proposed Engineering Solution\n- Technical methodology & system architecture\n- Hardware components / Microcontrollers (ESP32/STM32/Sensors)\n- Software stack / Communication protocol (BLE/LoRa/MQTT)\n\n## 4. Proof of Concept (PoC)\n- **PoC Link**: [Google Drive / GitHub / Simulation Link]\n- Description of simulation, schematic, or demo test\n\n## 5. Practical Impact & Feasibility\n- Expected campus benefits & energy/time savings\n- Ease of fabrication for Final Display`;
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(templateContent).then(() => {
+              showToast('Proposal Document Template copied to clipboard!');
+            });
+          } else {
+            showToast('Template ready for drafting.');
+          }
+        });
+      }
+
+      // ==========================================================================
+      // 8. ACCORDION (GUIDELINES)
+      // ==========================================================================
+      const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+      accordionHeaders.forEach((header) => {
+        header.addEventListener('click', () => {
+          const item = header.closest('.accordion-item');
+          const body = item.querySelector('.accordion-body');
+          const isOpen = item.classList.contains('open');
+
+          document.querySelectorAll('.accordion-item').forEach((otherItem) => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('open');
+              const otherHeader = otherItem.querySelector('.accordion-header');
+              const otherBody = otherItem.querySelector('.accordion-body');
+              if (otherHeader) otherHeader.setAttribute('aria-expanded', 'false');
+              if (otherBody) otherBody.style.maxHeight = '0';
+            }
+          });
+
+          if (isOpen) {
+            item.classList.remove('open');
+            header.setAttribute('aria-expanded', 'false');
+            body.style.maxHeight = '0';
+          } else {
+            item.classList.add('open');
+            header.setAttribute('aria-expanded', 'true');
+            body.style.maxHeight = body.scrollHeight + 'px';
+          }
+        });
+      });
+
+    })();
+  </script>
+</body>
+
+</html>

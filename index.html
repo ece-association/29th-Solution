@@ -2008,6 +2008,7 @@
   <div class="hardware-grid-bg" aria-hidden="true"></div>
   <canvas id="pcbCanvas" aria-hidden="true"></canvas>
 
+
   <!-- ==========================================================================
        STICKY NAVIGATION BAR (CLEAN DUAL LOGOS)
        ========================================================================== -->
@@ -2153,7 +2154,7 @@
             <div class="scope-header">
               <div class="scope-title">
                 <span class="pulse-led" aria-hidden="true"></span>
-                <span>Use College Mail ID to Register!!</span>
+                <span>Use College Mail ID to Register</span>
               </div>
             </div>
 
@@ -2350,22 +2351,22 @@
       <div class="problems-grid" id="problemsGrid">
 
         <!-- PS 1 -->
-        <article class="problem-card" data-category="hardware" data-id="1">
+        <article class="problem-card" data-category="platform" data-id="1">
           <div>
             <div class="problem-header">
               <span class="problem-id">ECE-PS01</span>
-              <span class="problem-domain">RF & Audio • IoT</span>
+              <span class="problem-domain">Web Systems</span>
             </div>
-            <h3 class="problem-title">Smart Mic Battery & Interference Alert</h3>
+            <h3 class="problem-title">Notes Sharing Platform</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> During classes and events, microphones may suddenly stop because
-              their battery
-              level is unknown. This causes interruptions, delays, and sometimes audio interference.
+              <strong>Problem:</strong> Students often rely on scattered WhatsApp groups, personal messages, and
+              different platforms to find and share academic notes and study materials. Develop a solution that provides
+              a centralized and organized platform for sharing and accessing notes.
             </p>
           </div>
           <div class="problem-card-footer">
             <button type="button" class="copy-statement-btn"
-              data-copy="ECE-PS01: Smart Mic Battery & Interference Alert - During classes and events, microphones may suddenly stop because their battery level is unknown. This causes interruptions, delays, and sometimes audio interference.">
+              data-copy="ECE-PS01: Notes Sharing Platform - Students often rely on scattered WhatsApp groups, personal messages, and different platforms to find and share academic notes and study materials. Develop a solution that provides a centralized and organized platform for sharing and accessing notes.">
               <span>📋 Copy Statement</span>
             </button>
             <a href="#submission-guide" class="btn btn-outline btn-sm">
@@ -2431,16 +2432,16 @@
               <span class="problem-id">ECE-PS04</span>
               <span class="problem-domain">Web Systems • Peer Collab</span>
             </div>
-            <h3 class="problem-title">Hackathon Team Formation & Notes Sharing Platform</h3>
+            <h3 class="problem-title">Hackathon Team Formation</h3>
             <p class="problem-statement-text">
-              <strong>Problem:</strong> Students often struggle to find suitable hackathon teammates based
-              on skills and
-              interests, while useful notes and resources are scattered across different platforms.
+              <strong>Problem:</strong> Students often find it difficult to identify and connect with suitable teammates
+              for hackathons based on their skills, interests, and preferred roles. Develop a solution that helps
+              students discover and form suitable hackathon teams efficiently.
             </p>
           </div>
           <div class="problem-card-footer">
             <button type="button" class="copy-statement-btn"
-              data-copy="ECE-PS04: Hackathon Team Formation & Notes Sharing Platform - Students often struggle to find suitable hackathon teammates based on skills and interests, while useful notes and resources are scattered across different platforms.">
+              data-copy="ECE-PS04: Hackathon Team Formation - Students often find it difficult to identify and connect with suitable teammates for hackathons based on their skills, interests, and preferred roles. Develop a solution that helps students discover and form suitable hackathon teams efficiently.">
               <span>📋 Copy Statement</span>
             </button>
             <a href="#submission-guide" class="btn btn-outline btn-sm">
@@ -3469,13 +3470,7 @@
         });
       });
 
-      // Copy Proposal Template Button
-      const copyTemplateBtn = document.getElementById('copyTemplateBtn');
-      if (copyTemplateBtn) {
-        copyTemplateBtn.addEventListener('click', () => {
-          const templateContent = `# 29th Solution – Proposal Document\n\n## 1. Team & Problem Info\n- **Team Name**: [Your Squad Name]\n- **Team Size**: 3–5 Members (All ECE Dept)\n- **Year(s)**: [1st / 2nd / 3rd / 4th Year]\n- **Chosen Problem**: [e.g. ECE-PS01 / ECE-PS05 / Open Innovation]\n\n## 2. Problem Understanding\n- Root cause & pain point identified in campus / labs\n- Target stakeholders & operational context\n\n## 3. Proposed Engineering Solution\n- Technical methodology & system architecture\n- Hardware components / Microcontrollers (ESP32/STM32/Sensors)\n- Software stack / Communication protocol (BLE/LoRa/MQTT)\n\n## 4. Proof of Concept (PoC)\n- **PoC Link**: [Google Drive / GitHub / Simulation Link]\n- Description of simulation, schematic, or demo test\n\n## 5. Practical Impact & Feasibility\n- Expected campus benefits & energy/time savings\n- Ease of fabrication for Final Display`;
-        });
-      }
+
 
       // ==========================================================================
       // 8. ACCORDION (GUIDELINES)

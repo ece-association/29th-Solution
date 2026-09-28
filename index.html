@@ -849,6 +849,61 @@
       font-weight: 600;
     }
 
+    .scope-meta-item.scope-meta-shortlist {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(16, 48, 42, 0.9) 0%, rgba(6, 26, 22, 0.95) 100%);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.15), inset 0 0 12px rgba(0, 212, 255, 0.05);
+      padding: 0.75rem 0.9rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+
+    .scope-meta-item.scope-meta-shortlist::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    .scope-shortlist-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      background: var(--copper-primary);
+      color: #071512;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.45rem 0.9rem;
+      border-radius: 3px;
+      border: 1px solid var(--copper-bright);
+      box-shadow: 0 3px 12px rgba(207, 138, 76, 0.35);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .scope-shortlist-btn:hover {
+      background: var(--copper-bright);
+      color: #04100c;
+      box-shadow: 0 0 18px rgba(240, 163, 89, 0.65);
+      transform: translateY(-1px);
+    }
+
     /* COUNTDOWN TIMER CARD */
     .countdown-card {
       background: var(--bg-deep);
@@ -2203,10 +2258,10 @@
             <div class="scope-meta-grid">
               <div class="scope-meta-item">
                 <div class="scope-meta-label">PRIZE POOL</div>
-                <div class="scope-meta-val">₹5000</div>
-                <div class="scope-meta-label">Winners - ₹2500</div>
-                <div class="scope-meta-label">1st Runner Up - ₹1500</div>
-                <div class="scope-meta-label">2nd Runner Up - ₹1000</div>
+                <div class="scope-meta-val">&#8377;5,000</div>
+                <div class="scope-meta-label">Winners - &#8377;2,500</div>
+                <div class="scope-meta-label">1st Runner Up - &#8377;1,500</div>
+                <div class="scope-meta-label">2nd Runner Up - &#8377;1,000</div>
               </div>
               <div class="scope-meta-item">
                 <div class="scope-meta-label">ABSTRACT SUBMISSION DEADLINE</div>
@@ -2214,7 +2269,32 @@
                 <div class="scope-meta-label">SHORTLIST ANNOUNCEMENT*</div>
                 <div class="scope-meta-val">27/09/2026</div>
               </div>
-
+              <div class="scope-meta-item scope-meta-shortlist">
+                <div>
+                  <div class="scope-meta-label"
+                    style="color: var(--neon-cyan); font-weight: 700; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                    <span class="pulse-led"
+                      style="background: var(--neon-cyan); box-shadow: 0 0 6px var(--neon-cyan); width: 6px; height: 6px;"
+                      aria-hidden="true"></span>
+                    <span>STAGE 01 RESULTS</span>
+                  </div>
+                  <div class="scope-meta-val" style="color: var(--text-main); font-size: 0.78rem; font-weight: 600;">
+                    Shortlist Announced
+                  </div>
+                </div>
+                <a href="Shortlist_29th Solution.pdf" target="_blank" rel="noopener noreferrer" class="scope-shortlist-btn"
+                  id="btnShortlisted" title="Open Stage 01 Shortlisted Teams PDF">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  <span>Shortlisted</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
